@@ -1,0 +1,28 @@
+﻿global using System.Collections;
+global using System.Collections.Generic;
+global using System.Reflection;
+global using System.Diagnostics;
+global using System.Globalization;
+global using System.IO;
+global using System.Text;
+global using System.Text.Encodings.Web;
+global using System.ComponentModel;
+global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using System.Data;
+global using System.Linq;
+global using System.Security.Claims;
+global using System.Web;
+
+global using Microsoft.AspNetCore.Mvc.Infrastructure;
+global using Microsoft.AspNetCore.Mvc;
+
+global using Microsoft.EntityFrameworkCore;
+
+global using Microsoft.Extensions.Options;
+
+global using EFCoreWebApi.Library;
+
+global using Microsoft.AspNetCore.Authentication;
+global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.IdentityModel.Tokens;
