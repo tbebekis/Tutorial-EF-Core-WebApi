@@ -21,8 +21,21 @@ global using Microsoft.EntityFrameworkCore;
 
 global using Microsoft.Extensions.Options;
 
-global using EFCoreWebApi.Library;
+
 
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
+global using Microsoft.AspNetCore.Authorization;
+
 global using Microsoft.IdentityModel.Tokens;
+
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Converters;
+global using Newtonsoft.Json.Linq;
+global using Newtonsoft.Json.Serialization;
+
+global using EFCoreWebApi.Services;
+global using EFCoreWebApi.Entities;
+global using EFCoreWebApi.Models;
+global using EFCoreWebApi.Library;
+

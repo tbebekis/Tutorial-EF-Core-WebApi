@@ -36,7 +36,7 @@
         /// <summary>
         /// The api client of the current request
         /// </summary>
-        public ApiClient Client { get; set; }
+        public IApiClient Client { get; set; }
  
 
 
@@ -50,15 +50,12 @@
                 if (string.IsNullOrWhiteSpace(fCultureCode))
                 {
                     // read the token from HTTP headers
-                    JwtSecurityToken Token = JwtAuthHelper.ReadTokenFromRequestHeader(HttpContext);
-
-                    if (Token != null && Lib.ContainsClaim(Token.Claims, JwtAuthHelper.SCultureClaimType))
-                    {
-                        fCultureCode = Lib.GetClaimValue(Token.Claims, JwtAuthHelper.SCultureClaimType);
-                    }
+                    JwtSecurityToken Token = Lib.ReadTokenFromRequestHeader(HttpContext);
+                    if (Token != null)
+                        fCultureCode = Lib.GetCultureCode(Token);
                 }
 
-                return !string.IsNullOrWhiteSpace(fCultureCode) ? fCultureCode : "en-US";
+                return !string.IsNullOrWhiteSpace(fCultureCode) ? fCultureCode : Lib.Settings.Defaults.CultureCode;
             }
  
         }

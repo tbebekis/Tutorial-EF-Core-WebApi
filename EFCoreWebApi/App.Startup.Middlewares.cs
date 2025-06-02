@@ -9,6 +9,8 @@
             var HttpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
             var WebHostEnvironment = app.Environment;
 
+            
+
             // ● Lib initialization
             Lib.Initialize(RootServiceProvider, HttpContextAccessor, WebHostEnvironment, Configuration);
 

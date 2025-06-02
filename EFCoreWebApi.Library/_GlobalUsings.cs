@@ -12,6 +12,8 @@ global using System.Text;
 global using System.Text.Encodings.Web;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
+global using System.ComponentModel.DataAnnotations.Schema;
+global using System.Security.Cryptography;
 global using System.Security.Claims;
 global using System.IdentityModel.Tokens.Jwt;
 
@@ -45,6 +47,16 @@ global using Microsoft.IdentityModel.Tokens;
 
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Options;
+
+global using Newtonsoft.Json;
+global using Newtonsoft.Json.Converters;
+global using Newtonsoft.Json.Linq;
+global using Newtonsoft.Json.Serialization;
+
+global using EFCoreWebApi.Services;
+global using EFCoreWebApi.Entities;
+global using EFCoreWebApi.Models;
+global using EFCoreWebApi.Library;
 
 
 

@@ -12,7 +12,7 @@
         /// </summary>
         public string Issuer { get; set; } = "EFCoreWebApi";
         /// <summary>
-        /// Optional. A string array or a signle string or URI value identifying the recipients that the Jwt Token is intended for.
+        /// Optional. A string array or a single string or URI value identifying the recipients that the Jwt Token is intended for.
         /// <para>SEE: https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3 </para>
         /// </summary>
         public string Audience { get; set; } = "All";

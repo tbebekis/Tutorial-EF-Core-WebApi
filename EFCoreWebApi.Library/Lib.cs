@@ -5,6 +5,7 @@
     /// </summary>
     static public partial class Lib
     {
+        public const string SDefaultId = "00000000-0000-0000-0000-000000000000";
 
         static AppCache fCache;
 
@@ -69,6 +70,19 @@
             {
                 Lib.Settings = NewAppSettings;
             });
+        }
+
+        /// <summary>
+        /// Returns application's <see cref="DbContext"/>
+        /// </summary>
+        static public AppDbContext GetDbContext()
+        {
+            HttpContext HttpContext = Lib.GetHttpContext();
+
+            IServiceScope Scope = HttpContext.RequestServices.CreateScope();
+            AppDbContext Result = Scope.ServiceProvider.GetService<AppDbContext>();
+
+            return Result;
         }
 
         // ● miscs
