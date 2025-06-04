@@ -4,11 +4,23 @@ global using System.Reflection;
 global using System.Diagnostics;
 global using System.Globalization;
 global using System.IO;
+global using System.Buffers;
 global using System.Net;
+global using System.Net.Http.Json;
 global using System.Web;
 global using System.Data;
 global using System.Linq;
 global using System.Text;
+global using System.Text.Json;
+global using System.Text.Json.Serialization;
+global using System.Text.Json.Serialization.Metadata;
+global using System.Text.Json.Nodes;
+
+
+
+ 
+
+
 global using System.Text.Encodings.Web;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
@@ -47,16 +59,14 @@ global using Microsoft.IdentityModel.Tokens;
 
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Options;
-
-global using Newtonsoft.Json;
-global using Newtonsoft.Json.Converters;
-global using Newtonsoft.Json.Linq;
-global using Newtonsoft.Json.Serialization;
+ 
 
 global using EFCoreWebApi.Services;
 global using EFCoreWebApi.Entities;
 global using EFCoreWebApi.Models;
 global using EFCoreWebApi.Library;
+
+
 
 
 

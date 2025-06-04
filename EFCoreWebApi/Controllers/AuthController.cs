@@ -10,10 +10,11 @@
             Service = service;
         }
 
-        [HttpPost("authenticate")]
-        [AllowAnonymous]
-        //public IActionResult Authenticate(string ClientId, string Secret, string CultureCode)         // POST api/v1/authenticate?ClientId=teo&Secret=webdesk&CultureCode=en-US
-        public IActionResult Authenticate([FromBody] ApiClientCredentials M)
+        [EndpointDescription("Authenticates a client.")]
+        [Produces<ApiItemResult<ApiToken>>]
+        [Tags("Security")]
+        [HttpPost("authenticate"), AllowAnonymous]
+        public ApiItemResult<ApiToken> Authenticate([FromBody] ApiClientCredentials M)
         {
             string ClientId = M.ClientId; 
             string Secret = M.Secret; 
@@ -23,21 +24,22 @@
                 CultureCode = Lib.Settings.Defaults.CultureCode;
 
             if (!Lib.Settings.Defaults.SupportedCultures.Contains(CultureCode))
-                return BadRequest(new { message = "Invalid culture" });
+                return ApiItemResult<ApiToken>.BadRequest("Requested locale not supported.");
 
-            ApiItemResponse<IApiClient> DataResult = Service.ValidateApiClientCredentials(ClientId, Secret);
+            ApiItemResult<IApiClient> DataResult = Service.ValidateApiClientCredentials(ClientId, Secret);
             IApiClient Client = DataResult.Item;
 
             if (DataResult.Succeeded && Client != null)
             {
-                ApiItemResponse<ApiToken> TokenResponse = Lib.CreateAuthenticatedToken(Client, M.Locale);
-                //OkObjectResult Result = new OkObjectResult(TokenResponse);
-
-                return Json(TokenResponse);
-
+                ApiItemResult<ApiToken> TokenResponse = Lib.CreateAuthenticatedToken(Client, M.Locale);
+                return TokenResponse;
+            }
+            else
+            {
+                ApiItemResult<ApiToken>.ErrorResult(StatusCodes.Status401Unauthorized, "Wrong credentials.");
             }
 
-            return BadRequest(new { message = "Invalid ClientId or Secret." });
+            return ApiItemResult<ApiToken>.NoDataResult();
         }
     }
 }

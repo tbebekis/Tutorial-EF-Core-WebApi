@@ -1,9 +1,10 @@
 ﻿namespace EFCoreWebApi
 {
+
     /// <summary>
     /// Base response
     /// </summary>
-    public class ApiResponse
+    public class ApiResult
     {
         // ● public
         /// <summary>
@@ -40,12 +41,15 @@
         /// <summary>
         /// The list of errors
         /// </summary>
+        [Description("The list of errors, if any.")]
         public List<string> Errors { get; set; }
         /// <summary>
         /// Returns the text of all errors.
         /// </summary>
         [JsonIgnore]
         public string ErrorText => Succeeded? string.Empty: string.Join(Environment.NewLine, Errors.ToArray());
- 
+        [Description("The HTTP Status numeric code.")]
+        [DefaultValue(StatusCodes.Status200OK)]
+        public int HttpStatus { get; set; } = StatusCodes.Status200OK;
     }
 }

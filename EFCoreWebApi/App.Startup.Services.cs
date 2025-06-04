@@ -1,20 +1,19 @@
-﻿
-
-using EFCoreWebApi.Library;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using System.Text.Json.Serialization.Metadata;
-
-namespace EFCoreWebApi
+﻿namespace EFCoreWebApi
 {
+
 
     static public partial class App
     {
+        static void SetupJsonSerializerOptions(JsonSerializerOptions JsonOptions)
+        {
+            JsonOptions.PropertyNamingPolicy = null; // new JsonNamingPolicyAsIs();  
+            JsonOptions.PropertyNameCaseInsensitive = true;
+            JsonOptions.WriteIndented = true;
+        }
+
         static public void AddServices(WebApplicationBuilder builder)
         {
-            //JsonConvert.DefaultSettings = () => Lib.JsonSerializerSettings;
+ 
 
             // ● AppSettings
             App.Configuration = builder.Configuration;
@@ -30,7 +29,6 @@ namespace EFCoreWebApi
             // ● custom services 
             builder.Services.AddScoped<ApiClientContext>();
             builder.Services.AddScoped<AuthService>();
-
 
             // ● HttpContext - NOTE: is singleton
             builder.Services.AddHttpContextAccessor();
@@ -76,91 +74,17 @@ namespace EFCoreWebApi
             // ● Authorization  
             builder.Services.AddAuthorization();
 
-
-
-
-            /*
-            MvcBuilder.AddNewtonsoftJson(options =>
-            {
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();   // no camelCase
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
-                options.SerializerSettings.Converters.Add(new StringEnumConverter());
-            });
-
-            builder.Services.Configure<MvcNewtonsoftJsonOptions>(options =>
-            {
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();   // no camelCase
-                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                options.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
-                options.SerializerSettings.Converters.Add(new StringEnumConverter());
-            });
-            */
-
-
-
-            // .AddNewtonsoftJson(o => o.SerializerSettings.ContractResolver = new DefaultContractResolver())  NamingStrategy = new DefaultNamingStrategy()
-
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            // SEE: https://learn.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-swashbuckle
+            // ● OpenApi
             builder.Services.AddOpenApi();
-            builder.Services.AddEndpointsApiExplorer(); // https://localhost:7025/swagger
-            builder.Services.AddSwaggerGen(options => {
-                //options.SwaggerDoc.
-                //options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-                options.SwaggerGeneratorOptions.DescribeAllParametersInCamelCase = false;
-                //JsonSerializerOptionsProvider
-
-            });
-
-
-
-            /*
-            builder.Services.AddSingleton(serviceProvider =>
-            {
-                MvcNewtonsoftJsonOptions JsonOptions = new();
-                JsonOptions.SerializerSettings.ContractResolver = new DefaultContractResolver();   // no camelCase
-                JsonOptions.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                JsonOptions.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                JsonOptions.SerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                JsonOptions.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
-                JsonOptions.SerializerSettings.Converters.Add(new StringEnumConverter());
-
-                return Options.Create(JsonOptions);
-            });
-            */
-
-
-            //builder.Services.AddSwaggerGenNewtonsoftSupport();
-
-            //builder.Services.AddSingleton<IConfigureOptions<MvcNewtonsoftJsonOptions>>(JsonOptions);
-
-            // https://blog.stackademic.com/how-to-implement-and-personalize-swaggerui-in-a-net-9-web-api-c69824310fe0
-            // https://github.com/domaindrivendev/Swashbuckle.AspNetCore
-
-
+            //builder.Services.AddEndpointsApiExplorer(); // https://localhost:7025/swagger
+            // The Microsoft.AspNetCore.OpenApi document generator doesn't use the MVC JSON options.
+            // SEE: https://github.com/scalar/scalar/discussions/5828
+            builder.Services.ConfigureHttpJsonOptions(options => SetupJsonSerializerOptions(options.SerializerOptions));
 
             // ● Controllers
             IMvcBuilder MvcBuilder = builder.Services.AddControllers();
 
-            MvcBuilder.AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = null;
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
-
-            builder.Services.AddSingleton(serviceProvider =>
-            {
-                JsonOptions JsonOptions = new();
-                JsonOptions.JsonSerializerOptions.PropertyNamingPolicy = null;
-                JsonOptions.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-
-                return Options.Create(JsonOptions);
-            });
+            MvcBuilder.AddJsonOptions(options => SetupJsonSerializerOptions(options.JsonSerializerOptions));
         }
     }
 }

@@ -2,11 +2,7 @@
 {
     static public partial class Lib
     {
-        // ● Newtonsoft.Json
-        static JsonSerializerSettings fJsonSerializerSettings;
-
-
-
+ 
 
 
 
@@ -97,22 +93,6 @@
         // ● properties
         static public bool IsWindows => Environment.OSVersion.Platform == PlatformID.Win32NT || Environment.OSVersion.Platform == PlatformID.Win32Windows || Environment.OSVersion.Platform == PlatformID.WinCE;
         static public bool IsLinux => Environment.OSVersion.Platform == PlatformID.Unix;
-        static public JsonSerializerSettings JsonSerializerSettings
-        {
-            get
-            {
-                if(fJsonSerializerSettings == null)
-                {
-                    fJsonSerializerSettings = new JsonSerializerSettings();
-                    fJsonSerializerSettings.ContractResolver = new DefaultContractResolver() { NamingStrategy = new DefaultNamingStrategy() };   // no camelCase
-                    fJsonSerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    fJsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    fJsonSerializerSettings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                    fJsonSerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind;
-                    fJsonSerializerSettings.Converters.Add(new StringEnumConverter());
-                }
-                return fJsonSerializerSettings;
-            }
-        }
+ 
     }
 }

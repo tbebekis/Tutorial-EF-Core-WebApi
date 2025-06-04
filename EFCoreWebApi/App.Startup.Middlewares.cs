@@ -8,9 +8,7 @@
             var RootServiceProvider = (app as IApplicationBuilder).ApplicationServices;
             var HttpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
             var WebHostEnvironment = app.Environment;
-
-            
-
+ 
             // ● Lib initialization
             Lib.Initialize(RootServiceProvider, HttpContextAccessor, WebHostEnvironment, Configuration);
 
@@ -28,10 +26,17 @@
             {
                 app.MapOpenApi();
 
-                app.UseSwagger();
-                app.UseSwaggerUI(options =>
+                app.MapScalarApiReference(options =>
                 {
-                    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+                    var documents = new[]
+                    {
+                        new ScalarDocument("v1", "Production API", "/openapi/{documentName}.json")
+                    };
+                        
+                    options.AddDocuments(documents);
+
+                    //options.AddDocument("v1");
+                    //options.OpenApiRoutePattern = "/openapi/{documentName}.json";
                 });
             }
 

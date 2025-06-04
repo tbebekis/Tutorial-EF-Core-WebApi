@@ -1,10 +1,29 @@
 ﻿namespace EFCoreWebApi
 {
     /// <summary>
-    /// A <see cref="ApiResponse"/> response for lists of items.
+    /// A <see cref="ApiResult"/> response for lists of items.
     /// </summary>
-    public class ApiListResponse<T> : ApiResponse
+    public class ApiListResult<T> : ApiResult
     {
+
+        static public ApiListResult<T> ErrorResult(int HttpStatus, string ErrorMessage)
+        {
+            ApiListResult<T> Result = new ApiListResult<T>();
+            Result.HttpStatus = HttpStatus;
+            Result.AddError(ErrorMessage);
+            return Result;
+        }
+        static public ApiListResult<T> BadRequest(string ErrorMessage = "")
+        {
+            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? $"Bad request: {ErrorMessage}" : "Bad request";
+            return ErrorResult(StatusCodes.Status400BadRequest, ErrorMessage);
+        }
+        static public ApiListResult<T> NoDataResult(string ErrorMessage = "")
+        {
+            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : "No data.";
+            return BadRequest(ErrorMessage);
+        }
+
         static int GetTotalPages(int TotalItems, int PageSize)
         {
             if (TotalItems <= PageSize)
@@ -21,6 +40,7 @@
         /// <summary>
         /// The list of items
         /// </summary>
+        [Description("A list of result objects.")]
         public List<T> List { get; set; } = new List<T>();
 
         /// <summary>

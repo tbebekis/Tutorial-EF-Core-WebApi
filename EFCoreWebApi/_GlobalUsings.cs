@@ -5,6 +5,7 @@ global using System.Diagnostics;
 global using System.Globalization;
 global using System.IO;
 global using System.Text;
+global using System.Text.Json;
 global using System.Text.Encodings.Web;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
@@ -14,6 +15,7 @@ global using System.Linq;
 global using System.Security.Claims;
 global using System.Web;
 
+global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Mvc.Infrastructure;
 global using Microsoft.AspNetCore.Mvc;
 
@@ -29,10 +31,7 @@ global using Microsoft.AspNetCore.Authorization;
 
 global using Microsoft.IdentityModel.Tokens;
 
-global using Newtonsoft.Json;
-global using Newtonsoft.Json.Converters;
-global using Newtonsoft.Json.Linq;
-global using Newtonsoft.Json.Serialization;
+global using Scalar.AspNetCore;
 
 global using EFCoreWebApi.Services;
 global using EFCoreWebApi.Entities;

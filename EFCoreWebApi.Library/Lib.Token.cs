@@ -31,7 +31,7 @@
             return Lib.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Sub);
         }
 
-        static public ApiItemResponse<ApiToken> CreateAuthenticatedToken(IApiClient Client, string Culture)
+        static public ApiItemResult<ApiToken> CreateAuthenticatedToken(IApiClient Client, string Culture)
         {
             JwtSettings Settings = Lib.Settings.Jwt;
  
@@ -65,7 +65,7 @@
             Token.ExpiresOn = JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
 
             // ● Response
-            ApiItemResponse<ApiToken> Response = new();
+            ApiItemResult<ApiToken> Response = new();
             Response.Item = Token;
 
             return Response;
