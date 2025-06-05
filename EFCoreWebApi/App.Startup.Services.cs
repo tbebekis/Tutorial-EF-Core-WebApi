@@ -6,9 +6,17 @@
     {
         static void SetupJsonSerializerOptions(JsonSerializerOptions JsonOptions)
         {
-            JsonOptions.PropertyNamingPolicy = null; // new JsonNamingPolicyAsIs();  
+            JsonOptions.PropertyNamingPolicy = new JsonNamingPolicyAsIs();
+            JsonOptions.DictionaryKeyPolicy = JsonOptions.PropertyNamingPolicy;
             JsonOptions.PropertyNameCaseInsensitive = true;
             JsonOptions.WriteIndented = true;
+            JsonOptions.IgnoreReadOnlyProperties = true;
+            JsonOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // JsonIgnoreCondition.Always;
+            JsonOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+            JsonOptions.AllowTrailingCommas = true;
+            JsonOptions.NumberHandling = JsonNumberHandling.AllowReadingFromString;
+            JsonOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; // or ReferenceHandler.IgnoreCycles
+            JsonOptions.Converters.Insert(0, new JsonStringEnumConverter(JsonOptions.PropertyNamingPolicy));
         }
 
         static public void AddServices(WebApplicationBuilder builder)

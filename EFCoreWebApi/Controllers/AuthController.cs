@@ -16,6 +16,8 @@
         [HttpPost("authenticate"), AllowAnonymous]
         public ApiItemResult<ApiToken> Authenticate([FromBody] ApiClientCredentials M)
         {
+            ApiItemResult<ApiToken> Result = new();
+
             string ClientId = M.ClientId; 
             string Secret = M.Secret; 
             string CultureCode = M.Locale;
@@ -24,22 +26,27 @@
                 CultureCode = Lib.Settings.Defaults.CultureCode;
 
             if (!Lib.Settings.Defaults.SupportedCultures.Contains(CultureCode))
-                return ApiItemResult<ApiToken>.BadRequest("Requested locale not supported.");
-
-            ApiItemResult<IApiClient> DataResult = Service.ValidateApiClientCredentials(ClientId, Secret);
-            IApiClient Client = DataResult.Item;
-
-            if (DataResult.Succeeded && Client != null)
             {
-                ApiItemResult<ApiToken> TokenResponse = Lib.CreateAuthenticatedToken(Client, M.Locale);
-                return TokenResponse;
+                Result.BadRequest("Requested locale not supported.");
             }
             else
             {
-                ApiItemResult<ApiToken>.ErrorResult(StatusCodes.Status401Unauthorized, "Wrong credentials.");
+                ApiItemResult<IApiClient> DataResult = Service.ValidateApiClientCredentials(ClientId, Secret);
+                IApiClient Client = DataResult.Item;
+
+                if (DataResult.Succeeded && Client != null)
+                {
+                    Result = Lib.CreateAuthenticatedToken(Client, CultureCode);
+                    return Result;
+                }
+                else
+                {
+                    Result.ErrorResult(StatusCodes.Status401Unauthorized, "Wrong credentials.");
+                }
             }
 
-            return ApiItemResult<ApiToken>.NoDataResult();
+            Result.NoDataResult();
+            return Result;
         }
     }
 }
