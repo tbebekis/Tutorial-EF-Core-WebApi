@@ -11,12 +11,12 @@
         }
 
         [EndpointDescription("Authenticates a client.")]
-        [Produces<ApiItemResult<ApiToken>>]
+        [Produces<ApiItemResult<TokenData>>]
         [Tags("Security")]
         [HttpPost("authenticate"), AllowAnonymous]
-        public ApiItemResult<ApiToken> Authenticate([FromBody] ApiClientCredentials M)
+        public ApiItemResult<TokenData> Authenticate([FromBody] TokenRequest M)
         {
-            ApiItemResult<ApiToken> Result = new();
+            ApiItemResult<TokenData> Result = new();
 
             string ClientId = M.ClientId; 
             string Secret = M.Secret; 

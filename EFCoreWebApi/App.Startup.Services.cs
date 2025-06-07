@@ -21,7 +21,6 @@
 
         static public void AddServices(WebApplicationBuilder builder)
         {
- 
 
             // ● AppSettings
             App.Configuration = builder.Configuration;
@@ -58,6 +57,8 @@
 
             AuthBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, o => {
 
+                JwtSettings Jwt = Lib.Settings.Jwt;
+
                 TokenValidationParameters ValidationParams = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -67,11 +68,12 @@
                     RequireExpirationTime = true,
                     ClockSkew = TimeSpan.Zero,
 
-                    ValidIssuer = Lib.Settings.Jwt.Issuer,                  
-                    ValidAudiences = new List<string> { Lib.Settings.Jwt.Audience },                    
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Lib.Settings.Jwt.Secret))
+                    ValidIssuer = Jwt.Issuer,                  
+                    ValidAudiences = new List<string> { Jwt.Audience },                    
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey))
                 };
 
+            
                 o.RequireHttpsMetadata = false;
                 o.SaveToken = true;
                 o.TokenValidationParameters = ValidationParams;

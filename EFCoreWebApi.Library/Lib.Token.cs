@@ -1,4 +1,7 @@
-﻿namespace EFCoreWebApi.Library
+﻿using Microsoft.AspNetCore.SignalR;
+using System.Security.Principal;
+
+namespace EFCoreWebApi.Library
 {
     static public partial class Lib
     { 
@@ -31,9 +34,9 @@
             return Lib.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Sub);
         }
 
-        static public ApiItemResult<ApiToken> CreateAuthenticatedToken(IApiClient Client, string Culture)
+        static public ApiItemResult<TokenData> CreateAuthenticatedToken(IApiClient Client, string Culture)
         {
-            JwtSettings Settings = Lib.Settings.Jwt;
+            JwtSettings Jwt = Lib.Settings.Jwt;
  
             // ● Claims
             /// List of registered claims from different sources
@@ -45,30 +48,75 @@
             ClaimList.Add(new Claim(JwtRegisteredClaimNames.Locale, Culture));
 
             // JwtRegisteredClaimNames.Jti
+            // sub identifies the subject(user, account, etc.)
+            // jti identifies the token itself, preventing replay attacks
 
 
             // ● JWT token
-            var SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Settings.Secret));
+            var SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey));
+            var Credentials = new SigningCredentials(SecurityKey, SecurityAlgorithms.HmacSha256);
+            var ExpirationDateTime = DateTime.UtcNow.AddMinutes(Jwt.LifeTimeMinutes);
 
             JwtSecurityToken JwtToken = new JwtSecurityToken(
-                issuer: Settings.Issuer,
-                audience: Settings.Audience,
+                issuer: Jwt.Issuer,
+                audience: Jwt.Audience,
                 claims: ClaimList.ToArray(),
-                expires: DateTime.UtcNow.AddMinutes(Settings.LifeTimeMinutes),
-                notBefore: DateTime.UtcNow,
-                signingCredentials: new SigningCredentials(SecurityKey, SecurityAlgorithms.HmacSha256)
+                expires: ExpirationDateTime,                                // exp claim, indicates the latest time at which the token can be used
+                notBefore: DateTime.UtcNow,                                 // nbf claim, a timestamp before which the token is not valid
+                signingCredentials: Credentials
             );
 
             // ● Token
-            ApiToken Token = new ApiToken();
-            Token.Token = new JwtSecurityTokenHandler().WriteToken(JwtToken);
-            Token.ExpiresOn = JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
+            TokenData TokenData = new TokenData();
+            TokenData.Token = new JwtSecurityTokenHandler().WriteToken(JwtToken);
+            TokenData.ExpiresOn = JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
 
             // ● Response
-            ApiItemResult<ApiToken> Response = new();
-            Response.Item = Token;
+            ApiItemResult<TokenData> Response = new();
+            Response.Item = TokenData;
 
             return Response;
+        }
+
+        /// <summary>
+        /// Generates and returns a refresh token using <see cref="RandomNumberGenerator"/>
+        /// </summary>
+        static public string GenerateRefreshToken()
+        {
+            byte[] Buffer = new byte[32];
+            using (var RNG = RandomNumberGenerator.Create())
+            {
+                RNG.GetBytes(Buffer);
+                return Convert.ToBase64String(Buffer);
+            }
+        }
+        /// <summary>
+        /// Returns the <see cref="ClaimsPrincipal"/> out of an Access Token text
+        /// </summary>
+        static public ClaimsPrincipal GetPrincipalFromExpiredToken(string TokenText)
+        {
+            JwtSettings Jwt = Lib.Settings.Jwt;
+            var SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey));
+
+            var ValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,               // no audience validation
+                ValidateIssuer = false,                 // no issuer validation
+                ValidateIssuerSigningKey = true,        // signing key validation
+                IssuerSigningKey = SecurityKey,
+                ValidateLifetime = false                // no expiration date validation
+            };
+
+            JwtSecurityTokenHandler TokenHandler = new();
+
+            SecurityToken SecurityToken;
+            ClaimsPrincipal Principal = TokenHandler.ValidateToken(TokenText, ValidationParameters, out SecurityToken);
+            JwtSecurityToken JwtSecurityToken = SecurityToken as JwtSecurityToken;
+
+            if (JwtSecurityToken == null || !JwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return Principal;
         }
     }
 }

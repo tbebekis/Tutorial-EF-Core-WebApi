@@ -1,4 +1,4 @@
-﻿namespace EFCoreWebApi
+﻿namespace EFCoreWebApi.Responses
 {
 
     /// <summary>
@@ -48,6 +48,15 @@
 
             if (!string.IsNullOrWhiteSpace(Message))
                this.Message = Message;
+        }
+        public virtual void NotAuthenticated()
+        {
+            SetResult(StatusCodes.Status401Unauthorized, "Invalid Token. A valid JTW access token is required.");
+        }
+        public virtual void TokenExpired(string ErrorMessage)
+        {
+            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"The Access Token is expired";
+            SetResult(StatusCodes.Status401Unauthorized, ErrorMessage);
         }
         public virtual void ErrorResult(int HttpStatus, string ErrorMessage = null)
         {

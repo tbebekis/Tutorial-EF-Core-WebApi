@@ -1,10 +1,10 @@
-﻿namespace EFCoreWebApi.Library
+﻿namespace EFCoreWebApi.Responses
 {
     /// <summary>
     /// Api Token Data
     /// </summary>
     [Description("The ApiToken object.")]
-    public class ApiToken
+    public class TokenData
     {
         /// <summary>
         /// The access token value.

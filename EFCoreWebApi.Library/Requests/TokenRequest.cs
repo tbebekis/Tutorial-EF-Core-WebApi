@@ -1,11 +1,11 @@
-﻿namespace EFCoreWebApi.Models
+﻿namespace EFCoreWebApi.Requests
 {
 
     /// <summary>
-    /// Api Client Credentials request
+    /// Client Access Token request
     /// </summary>
-    [Description("Client Credentials request.")]
-    public class ApiClientCredentials
+    [Description("Client Access Token request.")]
+    public class TokenRequest
     {
         /// <summary>
         /// The ClientId
@@ -23,6 +23,7 @@
         /// <para>SEE: https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims</para>
         /// </summary>
         [Description("The locale code of the request, e.g. en-US, or null.")]
+        [DefaultValue(null)]
         public string Locale { get; set; }  
     }
 }

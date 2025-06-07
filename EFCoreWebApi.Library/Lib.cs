@@ -75,7 +75,7 @@
         /// <summary>
         /// Returns application's <see cref="DbContext"/>
         /// </summary>
-        static public AppDbContext GetDbContext()
+        static public AppDbContext GetDataContext()
         {
             HttpContext HttpContext = Lib.GetHttpContext();
 

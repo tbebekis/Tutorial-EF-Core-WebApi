@@ -15,12 +15,7 @@ global using System.Text.Json;
 global using System.Text.Json.Serialization;
 global using System.Text.Json.Serialization.Metadata;
 global using System.Text.Json.Nodes;
-
-
-
  
-
-
 global using System.Text.Encodings.Web;
 global using System.ComponentModel;
 global using System.ComponentModel.DataAnnotations;
@@ -54,16 +49,24 @@ global using Microsoft.Extensions.FileProviders;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Caching.Memory;
+global using Microsoft.Extensions.Options;
 
 global using Microsoft.IdentityModel.Tokens;
 
 global using Microsoft.EntityFrameworkCore;
-global using Microsoft.Extensions.Options;
- 
+global using Microsoft.EntityFrameworkCore.ValueGeneration;
+
+global using Microsoft.EntityFrameworkCore.Metadata;
+global using Microsoft.EntityFrameworkCore.Metadata.Internal;
+global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Microsoft.EntityFrameworkCore.Storage;
+global using Microsoft.EntityFrameworkCore.ChangeTracking;
+
 
 global using EFCoreWebApi.Services;
 global using EFCoreWebApi.Entities;
-global using EFCoreWebApi.Models;
+global using EFCoreWebApi.Requests;
+global using EFCoreWebApi.Responses;
 global using EFCoreWebApi.Library;
 
 

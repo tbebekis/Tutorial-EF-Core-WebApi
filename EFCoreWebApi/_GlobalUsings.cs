@@ -38,6 +38,7 @@ global using Scalar.AspNetCore;
 
 global using EFCoreWebApi.Services;
 global using EFCoreWebApi.Entities;
-global using EFCoreWebApi.Models;
+global using EFCoreWebApi.Requests;
+global using EFCoreWebApi.Responses;
 global using EFCoreWebApi.Library;
 

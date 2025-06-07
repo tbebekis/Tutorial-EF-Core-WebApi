@@ -1,12 +1,10 @@
-﻿namespace EFCoreWebApi
+﻿namespace EFCoreWebApi.Responses
 {
     /// <summary>
     /// A <see cref="ApiResult"/> response for a single item
     /// </summary>
     public class ApiItemResult<T> : ApiResult
     {
- 
-
         /// <summary>
         /// The item
         /// </summary>
