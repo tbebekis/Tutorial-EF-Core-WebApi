@@ -8,6 +8,7 @@
         public const string SDefaultId = "00000000-0000-0000-0000-000000000000";
 
         static AppCache fCache;
+ 
 
         /// <summary>
         /// Initializes this class
@@ -143,5 +144,14 @@
                 return fCache;
             }
         }
+        /// <summary>
+        /// Returns the <see cref="IObjectMapper"/> object mapper.
+        /// <para>The application may provide its own mapper.</para>
+        /// <para>The default mapper is a wrapper to the excellent AutoMaper library.</para>
+        /// <para>SEE: https://automapper.org/ </para>
+        /// </summary>
+        static public IObjectMapper ObjectMapper { get; } = new ObjectMapper();
+
+        static public bool UseInMemoryDatabase { get; } = true;
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace EFCoreWebApi.Controllers
 {
     [ApiController]
+    [Consumes("application/json")]
     public class WebApiController : ControllerBase
     {
         /// <summary>

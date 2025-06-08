@@ -1,4 +1,6 @@
-﻿namespace EFCoreWebApi
+﻿using EFCoreWebApi.Library;
+
+namespace EFCoreWebApi
 {
     static public partial class App
     {
@@ -46,6 +48,14 @@
 
 
             app.MapControllers();
+
+            Lib.AddObjectMappings();
+            Lib.ObjectMapper.Configure();
+
+            if (Lib.UseInMemoryDatabase)
+            {
+                DemoData.AddInMemoryData();
+            }
         }
     }
 }

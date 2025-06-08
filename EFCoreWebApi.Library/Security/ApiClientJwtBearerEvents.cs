@@ -87,5 +87,6 @@ namespace EFCoreWebApi.Library
             string JsonText = JsonSerializer.Serialize(ApiResult);
             return context.Response.WriteAsync(JsonText);
         }
+    
     }
 }

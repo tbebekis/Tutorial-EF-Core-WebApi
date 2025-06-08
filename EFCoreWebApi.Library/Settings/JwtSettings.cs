@@ -19,7 +19,7 @@
         /// <summary>
         /// The number of minutes a Jwt is valid.
         /// </summary>
-        public int LifeTimeMinutes { get; set; } = 1;
+        public int LifeTimeMinutes { get; set; } = 300;
     }
 }
  

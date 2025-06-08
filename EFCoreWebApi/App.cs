@@ -9,5 +9,7 @@
         /// </summary>
         static public AppSettings Settings => Lib.Settings;
 
+        
+
     }
 }

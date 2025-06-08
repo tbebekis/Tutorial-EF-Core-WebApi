@@ -34,7 +34,7 @@ namespace EFCoreWebApi.Library
             return Lib.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Sub);
         }
 
-        static public ApiItemResult<TokenData> CreateAuthenticatedToken(IApiClient Client, string Culture)
+        static public ApiItemResult<TokenResult> CreateAuthenticatedToken(IApiClient Client, string Culture)
         {
             JwtSettings Jwt = Lib.Settings.Jwt;
  
@@ -67,12 +67,12 @@ namespace EFCoreWebApi.Library
             );
 
             // ● Token
-            TokenData TokenData = new TokenData();
+            TokenResult TokenData = new TokenResult();
             TokenData.Token = new JwtSecurityTokenHandler().WriteToken(JwtToken);
-            TokenData.ExpiresOn = JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
+            TokenData.ExpiresOn = JwtToken.ValidTo; //JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
 
             // ● Response
-            ApiItemResult<TokenData> Response = new();
+            ApiItemResult<TokenResult> Response = new();
             Response.Item = TokenData;
 
             return Response;

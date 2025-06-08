@@ -1,6 +1,7 @@
 ﻿namespace EFCoreWebApi.Controllers
 {
-    
+
+    [Tags("Security")]
     public class AuthController : WebApiController
     {
         AuthService Service;
@@ -11,12 +12,11 @@
         }
 
         [EndpointDescription("Authenticates a client.")]
-        [Produces<ApiItemResult<TokenData>>]
-        [Tags("Security")]
+        [Produces<ApiItemResult<TokenResult>>]        
         [HttpPost("authenticate"), AllowAnonymous]
-        public ApiItemResult<TokenData> Authenticate([FromBody] TokenRequest M)
+        public ApiItemResult<TokenResult> Authenticate(TokenRequest M)
         {
-            ApiItemResult<TokenData> Result = new();
+            ApiItemResult<TokenResult> Result = new();
 
             string ClientId = M.ClientId; 
             string Secret = M.Secret; 

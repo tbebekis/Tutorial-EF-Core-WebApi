@@ -4,6 +4,7 @@
     /// <summary>
     /// A service or application which is client to this Api 
     /// </summary>
+    [Table("ApiClient")]
     public class ApiClient: BaseEntity, IApiClient
     {
         public ApiClient()
@@ -12,7 +13,8 @@
         }
         public ApiClient(string ClientId, string PlainTextSecret, string Name = "")
             : this()
-        { 
+        {
+            this.SetId();
             this.ClientId = ClientId;
             this.SecretSalt = Hasher.GenerateSalt(96);
             this.Secret = Hasher.Hash(PlainTextSecret, this.SecretSalt);

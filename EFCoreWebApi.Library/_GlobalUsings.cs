@@ -62,6 +62,7 @@ global using Microsoft.EntityFrameworkCore.Infrastructure;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;
 
+global using AutoMapper;
 
 global using EFCoreWebApi.Services;
 global using EFCoreWebApi.Entities;

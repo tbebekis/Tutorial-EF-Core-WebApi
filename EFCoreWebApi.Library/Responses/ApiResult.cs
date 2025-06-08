@@ -6,6 +6,8 @@
     /// </summary>
     public class ApiResult
     {
+        List<string> fErrors;
+
         // ● constructor
         public ApiResult()
         {
@@ -41,7 +43,7 @@
         public virtual void SetResult(int HttpStatus = -1, string ErrorMessage = null, string Message = null)
         {
             if (HttpStatus >= StatusCodes.Status100Continue)
-                this.HttpStatus = HttpStatus;
+                this.Status = HttpStatus;
 
             if (!string.IsNullOrWhiteSpace(ErrorMessage))
                 Errors.Add(ErrorMessage);
@@ -49,20 +51,22 @@
             if (!string.IsNullOrWhiteSpace(Message))
                this.Message = Message;
         }
+        public virtual void ErrorResult(int HttpStatus, string ErrorMessage = null)
+        {
+            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"Error: {HttpStatus}";
+            SetResult(HttpStatus: HttpStatus, ErrorMessage: ErrorMessage, "Error");
+        }
         public virtual void NotAuthenticated()
         {
-            SetResult(StatusCodes.Status401Unauthorized, "Invalid Token. A valid JTW access token is required.");
+            string ErrorMessage = "Invalid Token. A valid JTW access token is required.";
+            ErrorResult(StatusCodes.Status400BadRequest, ErrorMessage);
         }
         public virtual void TokenExpired(string ErrorMessage)
         {
             ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"The Access Token is expired";
-            SetResult(StatusCodes.Status401Unauthorized, ErrorMessage);
+            ErrorResult(StatusCodes.Status401Unauthorized, ErrorMessage);
         }
-        public virtual void ErrorResult(int HttpStatus, string ErrorMessage = null)
-        {
-            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"Error: {HttpStatus}";
-            SetResult(HttpStatus: HttpStatus, ErrorMessage: ErrorMessage);
-        } 
+
         public virtual void BadRequest(string ErrorMessage = null)
         {
             ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? $"Bad request: {ErrorMessage}" : "Bad request";
@@ -71,7 +75,7 @@
         public virtual void NoDataResult(string Message = null)
         {
             Message = !string.IsNullOrWhiteSpace(Message) ? $"No data: {Message}" : "No data.";
-            SetResult(HttpStatus: CustomStatusCodes.Status150NoData, Message: Message);
+            SetResult(HttpStatus: CustomStatusCodes.Status199NoData, Message: Message);
         }
 
         // ● properties
@@ -79,20 +83,29 @@
         /// True if there are no errors
         /// </summary>
         [JsonIgnore]
-        public bool Succeeded => Errors == null || Errors.Count == 0;
+        public bool Succeeded => fErrors == null || fErrors.Count == 0;
         /// <summary>
         /// Returns the text of all errors.
         /// </summary>
         [JsonIgnore]
         public string ErrorText => Succeeded ? string.Empty : string.Join(Environment.NewLine, Errors.ToArray());
  
-        [Description("The HTTP Status numeric code.")]
+        [Description("A Status numeric code. Could be a standard HTTP Status Code or a custom code.")]
         [DefaultValue(StatusCodes.Status200OK)]
-        public int HttpStatus { get; set; } = StatusCodes.Status200OK;
+        public int Status { get; set; } = StatusCodes.Status200OK;
         [Description("A response message. Defaults to OK.")]
         [DefaultValue("OK")]
         public string Message { get; set; } = "OK";
         [Description("The list of errors, if any.")]
-        public List<string> Errors { get; set; }
+        public List<string> Errors
+        {
+            get
+            {
+                if (fErrors == null)
+                    fErrors = new List<string>();
+                return fErrors;
+            }
+            set { fErrors = value; }
+        }
     }
 }

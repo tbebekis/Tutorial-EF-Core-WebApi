@@ -31,11 +31,18 @@
             // AddDbContext() scoped servicea
             // SEE: https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics
             //builder.Services.AddDbContextPool<AppDbContext>(context => context.UseSqlite(), poolSize: 1024);
-            builder.Services.AddDbContext<AppDbContext>(context => { context.UseInMemoryDatabase(AppDbContext.SMemoryDatabase); });
+
+            if (Lib.UseInMemoryDatabase)
+            {
+                builder.Services.AddDbContext<AppDbContext>();
+                //builder.Services.AddDbContext<AppDbContext>(context => { context.UseInMemoryDatabase(AppDbContext.SMemoryDatabase); });
+            }
+            
 
             // ● custom services 
             builder.Services.AddScoped<ApiClientContext>();
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped(typeof(DataService<>));
 
             // ● HttpContext - NOTE: is singleton
             builder.Services.AddHttpContextAccessor();
@@ -78,7 +85,7 @@
                 o.SaveToken = true;
                 o.TokenValidationParameters = ValidationParams;
 
-                o.Events = new ApiClientJwtBearerEvents();
+                //o.Events = new ApiClientJwtBearerEvents();
             });
 
             // ● Authorization  
@@ -92,7 +99,17 @@
             builder.Services.ConfigureHttpJsonOptions(options => SetupJsonSerializerOptions(options.SerializerOptions));
 
             // ● Controllers
-            IMvcBuilder MvcBuilder = builder.Services.AddControllers();
+            IMvcBuilder MvcBuilder = builder.Services.AddControllers()
+                .ConfigureApiBehaviorOptions(options =>
+                {
+                    options.SuppressModelStateInvalidFilter = false;                    // https://learn.microsoft.com/en-us/aspnet/core/web-api/#disable-automatic-400-response
+                    options.SuppressInferBindingSourcesForParameters = false;           // https://learn.microsoft.com/en-us/aspnet/core/web-api/#disable-inference-rules
+                    options.SuppressConsumesConstraintForFormFileParameters = true;     // https://learn.microsoft.com/en-us/aspnet/core/web-api/#multipartform-data-request-inference
+                    options.SuppressMapClientErrors = true;                             // https://learn.microsoft.com/en-us/aspnet/core/web-api/#disable-problemdetails-response
+                    options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
+                        "https://httpstatuses.com/404";
+                });
+
 
             MvcBuilder.AddJsonOptions(options => SetupJsonSerializerOptions(options.JsonSerializerOptions));
         }

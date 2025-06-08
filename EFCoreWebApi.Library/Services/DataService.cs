@@ -3,28 +3,24 @@
 
     /// <summary>
     /// A generic data service for entities derived from <see cref="BaseEntity"/>
+    /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
+    /// <para>NOTE: This service should be used with <strong>Disconnected Entities</strong>, SEE: https://learn.microsoft.com/en-us/ef/core/saving/disconnected-entities </para>
     /// </summary>
     public class DataService<T> where T : BaseEntity
     {
-   
-        /// <summary>
-        /// Finds and returns a property by name.
-        /// <para>For experimentation only.</para>
-        /// </summary>
-        protected IProperty FindProperty(string PropertyName)
-        {
-            return EntityType.FindProperty(PropertyName);
-        }
+        string fTableName;
+
 
         // ● get entity lists    
         /// <summary>
         /// Returns a list of all entities.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetAllAsync(AppDbContext DataContext)
         {
             DbSet<T> DbSet = DataContext.Set<T>();
+            int xxx = DbSet.Count();
             return await DbSet.AsNoTracking().ToListAsync();
         }    
         /// <summary>
@@ -32,7 +28,7 @@
         /// <para>A <c>raw SQL filter</c> is the WHERE part of a SQL statement without the <c>WHERE</c> word.</para>
         /// <para>For example: </para>
         /// <para><c>Amount >= 10.5 AND Name like '%John%'</c></para>
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetByRawSqlFilterAsync(AppDbContext DataContext, string FilterText)
@@ -43,19 +39,19 @@
         }
         /// <summary>
         /// Returns a list of entities filtered by a specified call-back.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetByFilterProcAsync(AppDbContext DataContext, Func<T, bool> Proc)
         {
             DbSet<T> DbSet = DataContext.Set<T>();
-            return await DbSet.Where(Proc).AsQueryable().AsNoTracking().ToListAsync();
+            return await DbSet.AsNoTracking().Where(Proc).AsQueryable().ToListAsync();
         }
 
         // ● pagination
         /// <summary>
         /// Returns a list of all entities.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetPagedAllAsync(AppDbContext DataContext, IPaging Paging)
@@ -72,7 +68,7 @@
         /// <para>A <c>raw SQL filter</c> is the WHERE part of a SQL statement without the <c>WHERE</c> word.</para>
         /// <para>For example: </para>
         /// <para><c>Amount >= 10.5 AND Name like '%John%'</c></para>
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetPagedByRawSqlFilterAsync(AppDbContext DataContext, string FilterText, IPaging Paging)
@@ -86,7 +82,7 @@
         }
         /// <summary>
         /// Returns a list of entities filtered by a specified call-back.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<List<T>> GetPagedByFilterProcAsync(AppDbContext DataContext, Func<T, bool> Proc, IPaging Paging)
@@ -102,21 +98,23 @@
         // ● get single entity
         /// <summary>
         /// Returns an entity by its Id primary key.
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<T> GetByIdAsync(AppDbContext DataContext, string Id)
         {
             DbSet<T> DbSet = DataContext.Set<T>();
-            return await DbSet.FirstOrDefaultAsync(x => x.Id == Id);
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Id);
         }
         /// <summary>
         /// Selects and returns a single entity from the database, based on a specified call-back
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
+        /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         protected virtual async Task<T> GetByProcAsync(AppDbContext DataContext, Func<T, bool> Proc)
         {
-            await Task.CompletedTask;
-            DbSet<T> DbSet = DataContext.Set<T>();
-            return DbSet.Where(Proc).FirstOrDefault();
+            DbSet<T> DbSet = DataContext.Set<T>();           
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => Proc(x));    //return DbSet.Where(Proc).FirstOrDefault();
         }
 
         // ● CRUD
@@ -125,9 +123,13 @@
         /// <para>Does <strong>not</strong> call <c>SaveChanges()</c>.</para>
         /// <para>Returns the <strong>trackable</strong> entity.</para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
+        /// <para>NOTE: if the specified entity comes without an Id, a new one Id is assigned to it.</para>
         /// </summary>
         protected virtual T Insert(AppDbContext DataContext, T Entity)
         {
+            if (string.IsNullOrWhiteSpace(Entity.Id))
+                Entity.SetId();
+
             EntityEntry<T> Entry = DataContext.Add(Entity);
             return Entry.Entity;
         }
@@ -161,12 +163,6 @@
         /// </summary>
         public DataService()
         {
-            using (var DataContext = GetDataContext())
-            {
-                EntityType = DataContext.Model.FindEntityType(typeof(T));
-                string Schema = EntityType.GetSchema();
-                TableName = EntityType.GetTableName();
-            }
         }
 
         // ● miscs
@@ -196,7 +192,7 @@
         /// <summary>
         /// Returns all the entities from the database table.
         /// <para>CAUTION: Not all Entities support this call.</para>
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
         public virtual async Task<ApiListResult<T>> GetAllAsync()
         {
@@ -216,7 +212,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 //throw;
@@ -229,7 +225,7 @@
         /// <para>A <c>raw SQL filter</c> is the WHERE part of a SQL statement without the <c>WHERE</c> word.</para>
         /// <para>For example: </para>
         /// <para><c>Amount >= 10.5 AND Name like '%John%'</c></para>
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
         public virtual async Task<ApiListResult<T>> GetByRawSqlFilterAsync(string FilterText)
         {
@@ -249,7 +245,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 //throw;
@@ -259,7 +255,7 @@
         }
         /// <summary>
         /// Returns a list of entities filtered by a specified call-back.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
         public virtual async Task<ApiListResult<T>> GetByFilterProcAsync(Func<T, bool> Proc)
         {
@@ -279,7 +275,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 //throw;
@@ -291,7 +287,7 @@
         // ● pagination
         /// <summary>
         /// Returns a list of all entities.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         public virtual async Task<ApiPagedListResult<T>> GetPagedAllAsync(int PageIndex, int PageSize)
@@ -314,7 +310,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -327,7 +323,7 @@
         /// <para>A <c>raw SQL filter</c> is the WHERE part of a SQL statement without the <c>WHERE</c> word.</para>
         /// <para>For example: </para>
         /// <para><c>Amount >= 10.5 AND Name like '%John%'</c></para>
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         public virtual async Task<ApiPagedListResult<T>> GetPagedByRawSqlFilterAsync(string FilterText, int PageIndex, int PageSize)
@@ -350,7 +346,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -360,7 +356,7 @@
         }
         /// <summary>
         /// Returns a list of entities filtered by a specified call-back.
-        /// <para>WARNING: <strong>Change tracking is disabled.</strong> Treat the returned entities as <strong>read-only</strong>.</para>
+        /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
         public virtual async Task<ApiPagedListResult<T>> GetPagedByFilterProcAsync(Func<T, bool> Proc, int PageIndex, int PageSize)
@@ -383,7 +379,7 @@
 
                 //AfterGetAll(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -420,7 +416,7 @@
 
                 //AfterGetById(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 //throw;
@@ -455,7 +451,7 @@
 
                 //AfterGetById(Result);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 //throw;
@@ -487,7 +483,7 @@
 
                 //AfterInsert(Entity);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -517,7 +513,7 @@
 
                 //AfterInsert(Entity);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -539,7 +535,7 @@
                 //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
 
                 //BeforeInsert(Entity);
-                using (var DataContext = L.GetDataContext())
+                using (var DataContext = GetDataContext())
                 {
                     Result.Item = Delete(DataContext, Entity);
                     await DataContext.SaveChangesAsync();
@@ -547,7 +543,7 @@
 
                 //AfterInsert(Entity);
             }
-            catch (Exception ex)
+            catch // (Exception ex)
             {
                 //Sys.LogError(ex, EntityType.Name);
                 throw;
@@ -557,14 +553,43 @@
         }
 
         // ● properties
-        /// <summary>
-        /// Returns the <see cref="IEntityType"/> entity type
-        /// </summary>
-        public IEntityType EntityType { get; }
+ 
         /// <summary>
         /// Returns the table name of the entity.
         /// </summary>
-        public string TableName { get; }
+        public string TableName
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(fTableName))
+                {
+                    using (var DataContext = GetDataContext())
+                    {
+                        DbSet<T> DbSet = DataContext.Set<T>();
+                        IEntityType EntityType = DataContext.Model.FindEntityType(typeof(T));
+                        if (EntityType != null)
+                            fTableName = EntityType.GetTableName();
+
+                        if (string.IsNullOrWhiteSpace(fTableName))
+                        {
+                            Type ClassType = typeof(T);
+
+                            if (ClassType.IsDefined(typeof(TableAttribute)))
+                            {
+                                var Attr = Attribute.GetCustomAttribute(ClassType, typeof(TableAttribute), true) as TableAttribute;
+                                fTableName = Attr.Name;
+                            }
+
+                            if (string.IsNullOrWhiteSpace(fTableName))
+                                fTableName = ClassType.Name;
+                        }
+
+                    }
+                }
+
+                return fTableName;
+            }
+        }
 
  
 

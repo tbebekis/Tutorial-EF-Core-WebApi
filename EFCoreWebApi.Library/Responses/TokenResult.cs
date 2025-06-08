@@ -4,7 +4,7 @@
     /// Api Token Data
     /// </summary>
     [Description("The ApiToken object.")]
-    public class TokenData
+    public class TokenResult
     {
         /// <summary>
         /// The access token value.
@@ -14,7 +14,7 @@
         /// <summary>
         /// UTC Expiration date and time.
         /// </summary>
-        [Description("UTC Expiration date and time as string.")]
-        public string ExpiresOn { get; set; }
+        [Description("UTC Expiration date and time.")]
+        public DateTime ExpiresOn { get; set; }
     }
 }
