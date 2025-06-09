@@ -2,6 +2,15 @@
 {
     public class JwtSettings
     {
+        int fTokenLifeTimeMinutes;
+        int fRefreshTokenLifeTimeMinutes;
+
+        public JwtSettings()
+        {
+            fTokenLifeTimeMinutes = 10;
+            fRefreshTokenLifeTimeMinutes = fTokenLifeTimeMinutes * 5;
+        }
+
         /// <summary>
         /// A string used in encrypting and signing the Jwt token.
         /// </summary>
@@ -17,9 +26,21 @@
         /// </summary>
         public string Audience { get; set; } = "All";
         /// <summary>
-        /// The number of minutes a Jwt is valid.
+        /// The number of minutes an Access Token is valid.
         /// </summary>
-        public int LifeTimeMinutes { get; set; } = 300;
+        public int TokenLifeTimeMinutes
+        {
+            get => fTokenLifeTimeMinutes >= 5 ? fTokenLifeTimeMinutes : 5;
+            set => fTokenLifeTimeMinutes = value;
+        }
+        /// <summary>
+        /// The number of minutes a Refresh Token is valid.
+        /// </summary>
+        public int RefreshTokenLifeTimeMinutes
+        {
+            get => fRefreshTokenLifeTimeMinutes <= TokenLifeTimeMinutes * 5 ? TokenLifeTimeMinutes * 5 : fRefreshTokenLifeTimeMinutes;
+            set => fRefreshTokenLifeTimeMinutes = value;
+        }
     }
 }
  

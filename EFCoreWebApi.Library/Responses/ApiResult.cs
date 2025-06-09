@@ -40,10 +40,10 @@
                 Errors.Clear();
         }
 
-        public virtual void SetResult(int HttpStatus = -1, string ErrorMessage = null, string Message = null)
+        public virtual void SetResult(int Status = -1, string ErrorMessage = null, string Message = null)
         {
-            if (HttpStatus >= StatusCodes.Status100Continue)
-                this.Status = HttpStatus;
+            if (Status >= StatusCodes.Status100Continue)
+                this.Status = Status;
 
             if (!string.IsNullOrWhiteSpace(ErrorMessage))
                 Errors.Add(ErrorMessage);
@@ -51,10 +51,10 @@
             if (!string.IsNullOrWhiteSpace(Message))
                this.Message = Message;
         }
-        public virtual void ErrorResult(int HttpStatus, string ErrorMessage = null)
+        public virtual void ErrorResult(int Status, string ErrorMessage = null)
         {
-            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"Error: {HttpStatus}";
-            SetResult(HttpStatus: HttpStatus, ErrorMessage: ErrorMessage, "Error");
+            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"Error: {Status}";
+            SetResult(Status: Status, ErrorMessage: ErrorMessage, "Error");
         }
         public virtual void NotAuthenticated()
         {
@@ -66,6 +66,14 @@
             ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"The Access Token is expired";
             ErrorResult(StatusCodes.Status401Unauthorized, ErrorMessage);
         }
+        public virtual void ExceptionResult(Exception Ex)
+        {
+            if (Ex != null)
+            {
+                string ErrorMessage = $"Exception: {Ex.Message}";
+                ErrorResult(CustomStatusCodes.Exception, ErrorMessage); 
+            }
+        }
 
         public virtual void BadRequest(string ErrorMessage = null)
         {
@@ -75,7 +83,7 @@
         public virtual void NoDataResult(string Message = null)
         {
             Message = !string.IsNullOrWhiteSpace(Message) ? $"No data: {Message}" : "No data.";
-            SetResult(HttpStatus: CustomStatusCodes.Status199NoData, Message: Message);
+            SetResult(Status: CustomStatusCodes.NoData, Message: Message);
         }
 
         // ● properties

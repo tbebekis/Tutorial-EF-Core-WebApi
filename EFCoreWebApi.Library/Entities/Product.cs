@@ -2,6 +2,7 @@
 {
     [Table("Product")]
     [Index(nameof(Name), IsUnique = true)]
+    [CRUDMode]
     public class Product: BaseEntity
     {
         public Product(string Name, decimal Price)

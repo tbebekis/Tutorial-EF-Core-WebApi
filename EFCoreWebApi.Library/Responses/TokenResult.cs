@@ -16,5 +16,10 @@
         /// </summary>
         [Description("UTC Expiration date and time.")]
         public DateTime ExpiresOn { get; set; }
+        /// <summary>
+        /// The refresh token value.
+        /// </summary>
+        [Description("The refresh token string.")]
+        public string RefreshToken { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EFCoreWebApi.Library
 {
-    static public partial class Lib
+    static public partial class Tokens
     {
         // ● Claims
         /// <summary>

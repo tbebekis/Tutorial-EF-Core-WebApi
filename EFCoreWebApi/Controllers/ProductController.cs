@@ -2,7 +2,7 @@
 {
     [Route("product")]
     [Tags("Products")]
-    public class ProductController: WebApiSecureController
+    public class ProductController: WebApiController
     {
         DataService<Product> Service = new();
 
@@ -12,7 +12,6 @@
         }
 
         // ● actions
-
         [EndpointDescription("Returns the list of all products.")]
         [Produces<ApiListResult<Product>>]        
         [HttpGet("list", Name = "Product.List")]

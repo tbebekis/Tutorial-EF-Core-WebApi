@@ -1,8 +1,6 @@
-﻿using System.Net.Http.Headers;
-
-namespace EFCoreWebApi.Library
+﻿namespace EFCoreWebApi.Library
 {
-    public class ApiClientJwtBearerEvents: JwtBearerEvents
+    public class ApiClientJwtBearerEvents: JwtBearerEvents // https://medium.com/@sametkarademir244/jwtbearerevents-in-asp-net-core-managing-token-events-04cdeb9dc30d
     {
         /// <summary>
         /// Invoked if exceptions are thrown during request processing. 
@@ -45,6 +43,24 @@ namespace EFCoreWebApi.Library
         /// </summary>
         public override Task TokenValidated(TokenValidatedContext context)
         {
+            ClaimsPrincipal Principal = context.Principal;
+            string JtiValue = Principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            if (!string.IsNullOrWhiteSpace(JtiValue))
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized; 
+                context.Fail("Invalid Token. A valid JTW access token is required.");
+            }
+            else
+            {
+                string JtiCacheKey = Tokens.GetJtiCacheKey(JtiValue);
+                object Value;
+                if (!Lib.Cache.TryGetValue(JtiCacheKey, out Value))
+                {
+                    throw new SecurityTokenException("Token has expired.");
+                }
+            }
+
             return base.TokenValidated(context);
         }
         /// <summary>
@@ -87,6 +103,5 @@ namespace EFCoreWebApi.Library
             string JsonText = JsonSerializer.Serialize(ApiResult);
             return context.Response.WriteAsync(JsonText);
         }
-    
     }
 }

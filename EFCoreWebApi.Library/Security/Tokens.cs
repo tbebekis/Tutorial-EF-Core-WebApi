@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using System.Security.Principal;
-
-namespace EFCoreWebApi.Library
+﻿namespace EFCoreWebApi.Library
 {
-    static public partial class Lib
-    { 
+    static public partial class Tokens
+    {
+        public const string CachePrefix_Jti = "Jti";
+        public const string CachePrefix_ClientId = "Client.Id";
+
         /// <summary>
         /// For debug purposes. 
         /// Reads a token by reading the <see cref="HeaderNames.Authorization"/> header 
@@ -27,35 +27,57 @@ namespace EFCoreWebApi.Library
         }
         static public string GetCultureCode(JwtSecurityToken Token)
         {
-            return Lib.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Locale);
+            return Tokens.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Locale);
         }
         static public string GetApiClientId(JwtSecurityToken Token)
         {
-            return Lib.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Sub);
+            return Tokens.GetClaimValue(Token.Claims, JwtRegisteredClaimNames.Sub);
         }
 
-        static public ApiItemResult<TokenResult> CreateAuthenticatedToken(IApiClient Client, string Culture)
+        static public string GetJtiCacheKey(string JtiValue)
+        {
+            string Result = $"{CachePrefix_Jti}+{JtiValue}";
+            return Result;
+        }
+        static public string GetClientIdCachKey(string Id)
+        {
+            string Result = $"{CachePrefix_ClientId}+{Id}";
+            return Result;
+        }
+        /// <summary>
+        /// Generates an Access Token based on a database table Id which identifies the client application and a requested locale.
+        /// </summary>
+        static public ApiItemResult<TokenResult> CreateAuthenticatedToken(string Id, string CultureCode)
         {
             JwtSettings Jwt = Lib.Settings.Jwt;
- 
+
+            if (string.IsNullOrWhiteSpace(CultureCode))
+                CultureCode = Lib.Settings.Defaults.CultureCode;
+
+            // ● handle Jti claim
+            string JtiValue = Lib.GenId();
+            string JtiCacheKey = GetJtiCacheKey(JtiValue);
+            Lib.Cache.Set(JtiCacheKey, JtiValue, Jwt.TokenLifeTimeMinutes);
+
+            // ● handle refresh token
+            string RefreshToken = GenerateRefreshToken();
+            string ClientIdCacheKey = GetClientIdCachKey(Id);
+            Lib.Cache.Set(JtiCacheKey, RefreshToken, Jwt.RefreshTokenLifeTimeMinutes);
+
             // ● Claims
             /// List of registered claims from different sources
             /// https://datatracker.ietf.org/doc/html/rfc7519#section-4
             /// http://openid.net/specs/openid-connect-core-1_0.html#IDToken
             /// https://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
             List<Claim> ClaimList = new List<Claim>();
-            ClaimList.Add(new Claim(JwtRegisteredClaimNames.Sub, Client.Id));
-            ClaimList.Add(new Claim(JwtRegisteredClaimNames.Locale, Culture));
-
-            // JwtRegisteredClaimNames.Jti
-            // sub identifies the subject(user, account, etc.)
-            // jti identifies the token itself, preventing replay attacks
-
-
+            ClaimList.Add(new Claim(JwtRegisteredClaimNames.Sub, Id));          // sub identifies the subject(user, account, etc.)
+            ClaimList.Add(new Claim(JwtRegisteredClaimNames.Jti, JtiValue));    // jti identifies the token itself, preventing replay attacks
+            ClaimList.Add(new Claim(JwtRegisteredClaimNames.Locale, CultureCode));
+ 
             // ● JWT token
             var SecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey));
             var Credentials = new SigningCredentials(SecurityKey, SecurityAlgorithms.HmacSha256);
-            var ExpirationDateTime = DateTime.UtcNow.AddMinutes(Jwt.LifeTimeMinutes);
+            var ExpirationDateTime = DateTime.UtcNow.AddMinutes(Jwt.TokenLifeTimeMinutes);
 
             JwtSecurityToken JwtToken = new JwtSecurityToken(
                 issuer: Jwt.Issuer,
@@ -67,15 +89,16 @@ namespace EFCoreWebApi.Library
             );
 
             // ● Token
-            TokenResult TokenData = new TokenResult();
-            TokenData.Token = new JwtSecurityTokenHandler().WriteToken(JwtToken);
-            TokenData.ExpiresOn = JwtToken.ValidTo; //JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
+            TokenResult TokenResult = new TokenResult();
+            TokenResult.Token = new JwtSecurityTokenHandler().WriteToken(JwtToken);
+            TokenResult.ExpiresOn = JwtToken.ValidTo; //JwtToken.ValidTo.ToString("yyyy-MM-dd HH:mm");
+            TokenResult.RefreshToken = RefreshToken;
 
             // ● Response
-            ApiItemResult<TokenResult> Response = new();
-            Response.Item = TokenData;
+            ApiItemResult<TokenResult> Result = new();
+            Result.Item = TokenResult;
 
-            return Response;
+            return Result;
         }
 
         /// <summary>

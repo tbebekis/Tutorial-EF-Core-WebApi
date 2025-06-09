@@ -2,6 +2,7 @@
 {
     [ApiController]
     [Consumes("application/json")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class WebApiController : ControllerBase
     {
         /// <summary>
@@ -10,7 +11,7 @@
         [NonAction]
         protected JsonResult Json(object data)
         {
-            return new JsonResult(data); // , Lib.JsonSerializerSettings
+            return new JsonResult(data);  
         }
     }
 }

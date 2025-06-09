@@ -1,4 +1,4 @@
-﻿namespace EFCoreWebApi 
+﻿namespace EFCoreWebApi.Library
 {
     public interface IPaging
     {

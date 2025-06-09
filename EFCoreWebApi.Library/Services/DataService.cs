@@ -10,6 +10,12 @@
     {
         string fTableName;
 
+        protected virtual void CheckCRUDMode(CRUDMode Mode)
+        {
+            bool IsSet = (AllowedCRUDModes & Mode) == Mode;
+            if (!IsSet)
+                throw new ApplicationException($"CRUD mode not supported: {Mode}");
+        }
 
         // ● get entity lists    
         /// <summary>
@@ -20,7 +26,6 @@
         protected virtual async Task<List<T>> GetAllAsync(AppDbContext DataContext)
         {
             DbSet<T> DbSet = DataContext.Set<T>();
-            int xxx = DbSet.Count();
             return await DbSet.AsNoTracking().ToListAsync();
         }    
         /// <summary>
@@ -163,6 +168,16 @@
         /// </summary>
         public DataService()
         {
+            Type ClassType = typeof(T);
+            if (ClassType.IsDefined(typeof(CRUDModeAttribute)))
+            {
+                var Attr = Attribute.GetCustomAttribute(ClassType, typeof(CRUDModeAttribute), true) as CRUDModeAttribute;
+                AllowedCRUDModes = Attr.Modes;
+            }
+            else
+            {
+                AllowedCRUDModes = CRUDMode.All;
+            }
         }
 
         // ● miscs
@@ -200,22 +215,16 @@
 
             try
             {
-                //if (!Bf.In(CRUDMode.GetAll, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: GetAll");
-
-                //BeforeGetAll();
+                CheckCRUDMode(CRUDMode.GetAll);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetAllAsync(DataContext);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                //throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -233,22 +242,16 @@
 
             try
             {
-                //if (!Bf.In(CRUDMode.GetAll, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: GetAll");
-
-                //BeforeGetAll();
+                CheckCRUDMode(CRUDMode.GetByFilter);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetByRawSqlFilterAsync(DataContext, FilterText);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                //throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -263,22 +266,16 @@
 
             try
             {
-                //if (!Bf.In(CRUDMode.GetAll, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: GetAll");
-
-                //BeforeGetAll();
+                CheckCRUDMode(CRUDMode.GetByFilter);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetByFilterProcAsync(DataContext, Proc);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                //throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -298,22 +295,16 @@
                 Result.PageIndex = PageIndex;
                 Result.PageSize = PageSize;
 
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
-
-                //BeforeGetAll();
+                CheckCRUDMode(CRUDMode.GetAll);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetPagedAllAsync(DataContext, Result);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -331,25 +322,19 @@
             ApiPagedListResult<T> Result = new();
             try
             {
+                CheckCRUDMode(CRUDMode.GetByFilter);
+
                 Result.PageIndex = PageIndex;
                 Result.PageSize = PageSize;
-
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
-
-                //BeforeGetAll();
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetPagedByRawSqlFilterAsync(DataContext, FilterText, Result);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -364,25 +349,19 @@
             ApiPagedListResult<T> Result = new();
             try
             {
+                CheckCRUDMode(CRUDMode.GetByFilter);
+
                 Result.PageIndex = PageIndex;
                 Result.PageSize = PageSize;
-
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
-
-                //BeforeGetAll();
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.List = await GetPagedByFilterProcAsync(DataContext, Proc, Result);
                 }
-
-                //AfterGetAll(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -398,28 +377,17 @@
 
             try
             {
-                //if (!Bf.In(CRUDMode.GetById, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: GetById");
-
-                //if (Descriptor.PrimaryKeyList.Count > 1)
-                //    Sys.Throw($"{EntityType.Name} Entity has a compound primary key");
-
-                //BeforeGetById(Id);
-
-                //var Params = new DynamicParameters();
-                //Params.Add(Descriptor.PrimaryKeyList[0].FieldName, Id);
+                CheckCRUDMode(CRUDMode.GetById);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.Item = await GetByIdAsync(DataContext, Id);
                 }
 
-                //AfterGetById(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                //throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -433,28 +401,16 @@
 
             try
             {
-                //if (!Bf.In(CRUDMode.GetById, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: GetById");
-
-                //if (Descriptor.PrimaryKeyList.Count > 1)
-                //    Sys.Throw($"{EntityType.Name} Entity has a compound primary key");
-
-                //BeforeGetById(Id);
-
-                //var Params = new DynamicParameters();
-                //Params.Add(Descriptor.PrimaryKeyList[0].FieldName, Id);
+                CheckCRUDMode(CRUDMode.GetByFilter);
 
                 using (var DataContext = GetDataContext())
                 {
                     Result.Item = await GetByProcAsync(DataContext, Proc);
                 }
-
-                //AfterGetById(Result);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                //throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -471,22 +427,17 @@
             ApiItemResult<T> Result = new();
             try
             {
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
+                CheckCRUDMode(CRUDMode.Insert);
 
-                //BeforeInsert(Entity);
                 using (var DataContext = GetDataContext())
                 {
                     Result.Item = Insert(DataContext, Entity);
                     await DataContext.SaveChangesAsync();
                 } 
-
-                //AfterInsert(Entity);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -501,22 +452,17 @@
             ApiItemResult<T> Result = new();
             try
             {
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
-
-                //BeforeInsert(Entity);
+                CheckCRUDMode(CRUDMode.Update);
+ 
                 using (var DataContext = GetDataContext())
                 {
                     Result.Item = Update(DataContext, Entity);
                     await DataContext.SaveChangesAsync();
                 }
-
-                //AfterInsert(Entity);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -531,22 +477,17 @@
             ApiItemResult<T> Result = new();
             try
             {
-                //if (!Bf.In(CRUDMode.Insert, Descriptor.Mode))
-                //    throw new NotSupportedException($"{EntityType.Name}. CRUD mode not supported: Insert");
+                CheckCRUDMode(CRUDMode.Delete);
 
-                //BeforeInsert(Entity);
                 using (var DataContext = GetDataContext())
                 {
                     Result.Item = Delete(DataContext, Entity);
                     await DataContext.SaveChangesAsync();
                 }
-
-                //AfterInsert(Entity);
             }
-            catch // (Exception ex)
+            catch (Exception ex)
             {
-                //Sys.LogError(ex, EntityType.Name);
-                throw;
+                Result.ExceptionResult(ex);
             }
 
             return Result;
@@ -590,7 +531,10 @@
                 return fTableName;
             }
         }
-
+        /// <summary>
+        /// A bit-field indicating the CRUD operations allowed to this Entity
+        /// </summary>
+        public CRUDMode AllowedCRUDModes { get; }
  
 
     }

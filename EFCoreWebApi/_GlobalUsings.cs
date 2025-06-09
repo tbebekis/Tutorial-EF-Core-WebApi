@@ -17,6 +17,7 @@ global using System.Data;
 global using System.Linq;
 global using System.Security.Claims;
 global using System.Web;
+global using System.IdentityModel.Tokens.Jwt;
 
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Mvc.Infrastructure;

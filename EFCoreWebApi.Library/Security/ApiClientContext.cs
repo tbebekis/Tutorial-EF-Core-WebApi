@@ -17,8 +17,7 @@
         {
             this.HttpContext = HttpContextAccessor.HttpContext;
         }
-
-
+ 
         // ● properties
         /// <summary>
         /// The http context
@@ -38,8 +37,6 @@
         /// </summary>
         public IApiClient Client { get; set; }
  
-
-
         /// <summary>
         /// The culture (language) of the current request specified as a culture code (en-US, el-GR)
         /// </summary>
@@ -50,17 +47,15 @@
                 if (string.IsNullOrWhiteSpace(fCultureCode))
                 {
                     // read the token from HTTP headers
-                    JwtSecurityToken Token = Lib.ReadTokenFromRequestHeader(HttpContext);
+                    JwtSecurityToken Token = Tokens.ReadTokenFromRequestHeader(HttpContext);
                     if (Token != null)
-                        fCultureCode = Lib.GetCultureCode(Token);
+                        fCultureCode = Tokens.GetCultureCode(Token);
                 }
 
                 return !string.IsNullOrWhiteSpace(fCultureCode) ? fCultureCode : Lib.Settings.Defaults.CultureCode;
             }
  
         }
-
-
         /// <summary>
         /// True when the request is authenticated.
         /// </summary>

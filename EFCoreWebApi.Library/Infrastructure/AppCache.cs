@@ -28,12 +28,13 @@
             return Cache.TryGetValue(Key, out var Item);
         }
         /// <summary>
-        /// Removes an entry by a specified key.
+        /// Removes an entry by a specified key, if is in the cache.
         /// <para>NOTE: Key is case sensitive.</para>
         /// </summary>
         public void Remove(string Key)
         {
-            Cache.Remove(Key);
+            if (ContainsKey(Key))
+                Cache.Remove(Key);
         }
 
         /// <summary>
@@ -52,6 +53,9 @@
         /// </summary>
         public void Set<T>(string Key, T Value, int TimeoutMinutes)
         {
+             
+            Remove(Key);
+
             if (TimeoutMinutes > 0)
             {
                 var o = new MemoryCacheEntryOptions();
@@ -190,8 +194,9 @@
 
         /* properties */
         /// <summary>
-        /// The default eviction timeout of an entry from the cache, in minutes. Defaults to 0 which means "use the timeouts of the internal implementation".
+        /// The default eviction timeout of an entry from the cache, in minutes. 
+        /// <para>Defaults to 0 which means "use the timeouts of the internal implementation".</para>
         /// </summary>
-        public int DefaultEvictionTimeoutMinutes { get; set; }
+        public int DefaultEvictionTimeoutMinutes { get; set; }  
     }
 }

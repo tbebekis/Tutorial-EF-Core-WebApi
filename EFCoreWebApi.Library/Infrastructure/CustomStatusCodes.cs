@@ -15,7 +15,10 @@
     /// </summary>
     static public class CustomStatusCodes
     {
-        public const int Status199NoData = 199;
+        
+        public const int UnknownError = 199;
+        public const int Exception = 198;
+        public const int NoData = 197;
     }
 
  

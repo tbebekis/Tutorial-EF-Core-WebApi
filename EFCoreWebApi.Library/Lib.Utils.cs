@@ -2,9 +2,6 @@
 {
     static public partial class Lib
     {
- 
-
-
 
         // ● strings 
         /// <summary>
