@@ -1,5 +1,8 @@
 ﻿namespace EFCoreWebApi.Library
 {
+    /// <summary>
+    /// Helper for handling tokens and claims
+    /// </summary>
     static public partial class Tokens
     {
         // ● Claims

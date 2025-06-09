@@ -1,6 +1,4 @@
-﻿using EFCoreWebApi.Library;
-
-namespace EFCoreWebApi
+﻿namespace EFCoreWebApi
 {
     static public partial class App
     {
@@ -22,6 +20,15 @@ namespace EFCoreWebApi
             // Lib App.SetupAppSettingsMonitor to hook into IOptionsMonitor<AppSettings>.OnChange()
             Lib.SetupAppSettingsMonitor(AppSettingsMonitor);
 
+            //----------------------------------------------------------------------------------------
+            // Middlewares
+            //----------------------------------------------------------------------------------------
+
+            app.UseStatusCodePages(Context => ErrorStatusCodeHandler.Handle(Context)); 
+
+
+            // ● global exception handler
+            app.UseExceptionHandler();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

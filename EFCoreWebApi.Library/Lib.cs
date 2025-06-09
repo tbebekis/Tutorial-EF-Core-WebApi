@@ -7,7 +7,7 @@
     {
         public const string SDefaultId = "00000000-0000-0000-0000-000000000000";
 
-        static AppCache fCache;
+        static IAppCache fCache;
  
 
         /// <summary>
@@ -129,18 +129,36 @@
         /// </summary>
         static public AppSettings Settings { get; private set; } = new AppSettings();
         /// <summary>
-        /// Represents an application memory cache.
+        /// Returns the application cache
         /// </summary>
-        static public AppCache Cache
+        static public IAppCache Cache
         {
             get
             {
                 if (fCache == null)
                 {
-                    AppCache Instance = new AppCache(GetService<IMemoryCache>());
-                    Instance.DefaultEvictionTimeoutMinutes = Settings.Defaults.CacheTimeoutMinutes;
-                    fCache = Instance;
+                    var MemCache = Lib.GetService<IMemoryCache>();
+                    if (MemCache != null)
+                    {
+                        fCache = new AppMemCache(MemCache);
+                        fCache.DefaultEvictionTimeoutMinutes = Settings.Defaults.CacheTimeoutMinutes;
+                    } 
                 }
+
+                if (fCache == null)
+                {
+                    var DistCache = Lib.GetService<IDistributedCache>();
+                    if (DistCache != null)
+                    {
+                        fCache = new AppDistCache(DistCache);
+                        fCache.DefaultEvictionTimeoutMinutes = Settings.Defaults.CacheTimeoutMinutes;
+                    }
+                }
+
+                if (fCache == null)
+                    throw new ApplicationException("No Cache Service is registered");
+
+ 
                 return fCache;
             }
         }

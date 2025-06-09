@@ -3,7 +3,7 @@
     /// <summary>
     /// A <see cref="ApiResult"/> response for lists of items.
     /// </summary>
-    public class ApiListResult<T> : ApiResult
+    public class ListResult<T> : ApiResult
     {
         /// <summary>
         /// The list of items

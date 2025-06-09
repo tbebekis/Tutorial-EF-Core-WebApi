@@ -1,6 +1,6 @@
 ﻿namespace EFCoreWebApi.Responses
 {
-    public class ApiPagedListResult<T>: ApiListResult<T>, IPaging
+    public class ListResultPaged<T>: ListResult<T>, IPaging
     {
  
 

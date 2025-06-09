@@ -13,11 +13,11 @@
 
         // ● actions
         [EndpointDescription("Returns the list of all products.")]
-        [Produces<ApiListResult<Product>>]        
+        [Produces<ListResult<Product>>]        
         [HttpGet("list", Name = "Product.List")]
-        public async Task<ApiListResult<Product>> List()
+        public async Task<ListResult<Product>> List()
         {
-            ApiListResult<Product> Result = await Service.GetAllAsync();
+            ListResult<Product> Result = await Service.GetAllAsync();
             return Result;
         }
     }

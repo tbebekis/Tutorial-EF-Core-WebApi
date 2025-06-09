@@ -209,9 +209,9 @@
         /// <para>CAUTION: Not all Entities support this call.</para>
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
-        public virtual async Task<ApiListResult<T>> GetAllAsync()
+        public virtual async Task<ListResult<T>> GetAllAsync()
         {
-            ApiListResult<T> Result = new();
+            ListResult<T> Result = new();
 
             try
             {
@@ -236,9 +236,9 @@
         /// <para><c>Amount >= 10.5 AND Name like '%John%'</c></para>
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
-        public virtual async Task<ApiListResult<T>> GetByRawSqlFilterAsync(string FilterText)
+        public virtual async Task<ListResult<T>> GetByRawSqlFilterAsync(string FilterText)
         {
-            ApiListResult<T> Result = new();
+            ListResult<T> Result = new();
 
             try
             {
@@ -260,9 +260,9 @@
         /// Returns a list of entities filtered by a specified call-back.
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// </summary>
-        public virtual async Task<ApiListResult<T>> GetByFilterProcAsync(Func<T, bool> Proc)
+        public virtual async Task<ListResult<T>> GetByFilterProcAsync(Func<T, bool> Proc)
         {
-            ApiListResult<T> Result = new();
+            ListResult<T> Result = new();
 
             try
             {
@@ -287,9 +287,9 @@
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
-        public virtual async Task<ApiPagedListResult<T>> GetPagedAllAsync(int PageIndex, int PageSize)
+        public virtual async Task<ListResultPaged<T>> GetPagedAllAsync(int PageIndex, int PageSize)
         {
-            ApiPagedListResult<T> Result = new();
+            ListResultPaged<T> Result = new();
             try
             {
                 Result.PageIndex = PageIndex;
@@ -317,9 +317,9 @@
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
-        public virtual async Task<ApiPagedListResult<T>> GetPagedByRawSqlFilterAsync(string FilterText, int PageIndex, int PageSize)
+        public virtual async Task<ListResultPaged<T>> GetPagedByRawSqlFilterAsync(string FilterText, int PageIndex, int PageSize)
         {
-            ApiPagedListResult<T> Result = new();
+            ListResultPaged<T> Result = new();
             try
             {
                 CheckCRUDMode(CRUDMode.GetByFilter);
@@ -344,9 +344,9 @@
         /// <para>WARNING: <strong>Change tracking is disabled.</strong></para>
         /// <para>NOTE: it can be used from inside a transaction.</para>
         /// </summary>
-        public virtual async Task<ApiPagedListResult<T>> GetPagedByFilterProcAsync(Func<T, bool> Proc, int PageIndex, int PageSize)
+        public virtual async Task<ListResultPaged<T>> GetPagedByFilterProcAsync(Func<T, bool> Proc, int PageIndex, int PageSize)
         {
-            ApiPagedListResult<T> Result = new();
+            ListResultPaged<T> Result = new();
             try
             {
                 CheckCRUDMode(CRUDMode.GetByFilter);
@@ -371,9 +371,9 @@
         /// <summary>
         /// Selects and returns a single entity from the database, based on a specified primary key.
         /// </summary>
-        public virtual async Task<ApiItemResult<T>> GetByIdAsync(string Id)
+        public virtual async Task<ItemResult<T>> GetByIdAsync(string Id)
         {
-            ApiItemResult<T> Result = new();
+            ItemResult<T> Result = new();
 
             try
             {
@@ -395,9 +395,9 @@
         /// <summary>
         /// Selects and returns a single entity from the database, based on a specified call-back
         /// </summary>
-        public virtual async Task<ApiItemResult<T>> GetByProcAsync(Func<T, bool> Proc)
+        public virtual async Task<ItemResult<T>> GetByProcAsync(Func<T, bool> Proc)
         {
-            ApiItemResult<T> Result = new();
+            ItemResult<T> Result = new();
 
             try
             {
@@ -422,9 +422,9 @@
         /// <para>Calls <c>SaveChanges()</c>.</para>
         /// <para>Returns the <strong>trackable</strong> entity.</para>
         /// </summary>
-        public virtual async Task<ApiItemResult<T>> InsertAsync(T Entity)
+        public virtual async Task<ItemResult<T>> InsertAsync(T Entity)
         {
-            ApiItemResult<T> Result = new();
+            ItemResult<T> Result = new();
             try
             {
                 CheckCRUDMode(CRUDMode.Insert);
@@ -447,9 +447,9 @@
         /// <para>Calls <c>SaveChanges()</c>.</para>
         /// <para>Returns the <strong>trackable</strong> entity.</para>
         /// </summary>
-        public virtual async Task<ApiItemResult<T>> UpdateAsync(T Entity)
+        public virtual async Task<ItemResult<T>> UpdateAsync(T Entity)
         {
-            ApiItemResult<T> Result = new();
+            ItemResult<T> Result = new();
             try
             {
                 CheckCRUDMode(CRUDMode.Update);
@@ -472,9 +472,9 @@
         /// <para>Calls <c>SaveChanges()</c>.</para>
         /// <para>Returns the <strong>trackable</strong> entity.</para>
         /// </summary>
-        public virtual async Task<ApiItemResult<T>> DeleteAsync(T Entity)
+        public virtual async Task<ItemResult<T>> DeleteAsync(T Entity)
         {
-            ApiItemResult<T> Result = new();
+            ItemResult<T> Result = new();
             try
             {
                 CheckCRUDMode(CRUDMode.Delete);

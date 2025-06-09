@@ -3,7 +3,7 @@
     /// <summary>
     /// A <see cref="ApiResult"/> response for a single item
     /// </summary>
-    public class ApiItemResult<T> : ApiResult
+    public class ItemResult<T> : ApiResult
     {
         /// <summary>
         /// The item

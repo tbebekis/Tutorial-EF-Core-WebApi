@@ -46,14 +46,20 @@
                 this.Status = Status;
 
             if (!string.IsNullOrWhiteSpace(ErrorMessage))
-                Errors.Add(ErrorMessage);
+                Errors.Add(ErrorMessage); 
 
             if (!string.IsNullOrWhiteSpace(Message))
                this.Message = Message;
         }
         public virtual void ErrorResult(int Status, string ErrorMessage = null)
         {
-            ErrorMessage = !string.IsNullOrWhiteSpace(ErrorMessage) ? ErrorMessage : $"Error: {Status}";
+            if (!string.IsNullOrWhiteSpace(ErrorMessage))
+                ErrorMessage = $"Error: {ErrorMessage}";
+            else if (Status >= 400 && Status <= 599)
+                ErrorMessage = Microsoft.AspNetCore.WebUtilities.ReasonPhrases.GetReasonPhrase(Status);
+            else
+                ErrorMessage = $"Error: {Status}";
+
             SetResult(Status: Status, ErrorMessage: ErrorMessage, "Error");
         }
         public virtual void NotAuthenticated()
@@ -68,11 +74,8 @@
         }
         public virtual void ExceptionResult(Exception Ex)
         {
-            if (Ex != null)
-            {
-                string ErrorMessage = $"Exception: {Ex.Message}";
-                ErrorResult(CustomStatusCodes.Exception, ErrorMessage); 
-            }
+            string ErrorMessage = Ex == null? "Unspecified Exception": $"{Ex.GetType().Name}: {Ex.Message}";
+            ErrorResult(ApiStatusCodes.Exception, ErrorMessage);
         }
 
         public virtual void BadRequest(string ErrorMessage = null)
@@ -83,7 +86,7 @@
         public virtual void NoDataResult(string Message = null)
         {
             Message = !string.IsNullOrWhiteSpace(Message) ? $"No data: {Message}" : "No data.";
-            SetResult(Status: CustomStatusCodes.NoData, Message: Message);
+            SetResult(Status: ApiStatusCodes.NoData, Message: Message);
         }
 
         // ● properties
@@ -98,7 +101,7 @@
         [JsonIgnore]
         public string ErrorText => Succeeded ? string.Empty : string.Join(Environment.NewLine, Errors.ToArray());
  
-        [Description("A Status numeric code. Could be a standard HTTP Status Code or a custom code.")]
+        [Description("A Status numeric code. Could be a standard HTTP Status Code or an Api Status Code.")]
         [DefaultValue(StatusCodes.Status200OK)]
         public int Status { get; set; } = StatusCodes.Status200OK;
         [Description("A response message. Defaults to OK.")]

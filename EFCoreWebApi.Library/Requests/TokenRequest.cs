@@ -7,6 +7,8 @@
     [Description("Client Access Token request.")]
     public class TokenRequest
     {
+        string fLocale;
+
         /// <summary>
         /// The ClientId
         /// </summary>
@@ -24,6 +26,10 @@
         /// </summary>
         [Description("The locale code of the request, e.g. en-US, or null.")]
         [DefaultValue(null)]
-        public string Locale { get; set; }  
+        public string Locale
+        {
+            get => !string.IsNullOrWhiteSpace(fLocale) ? fLocale : Lib.Settings.Defaults.CultureCode;
+            set => fLocale = value;
+        }
     }
 }

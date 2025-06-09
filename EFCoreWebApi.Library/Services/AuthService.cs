@@ -7,9 +7,9 @@
         /// <summary>
         /// Validates the specified user credentials and returns a <see cref="IRequestor"/> on success, else null.
         /// </summary>
-        public ApiItemResult<IApiClient> ValidateApiClientCredentials(string ClientId, string PlainTextSecret)
+        public ItemResult<IApiClient> ValidateApiClientCredentials(string ClientId, string PlainTextSecret)
         {
-            ApiItemResult<IApiClient> Result = new();
+            ItemResult<IApiClient> Result = new();
 
             /*
             using (AppDbContext context = Lib.GetDbContext())

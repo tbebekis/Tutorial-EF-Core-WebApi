@@ -30,6 +30,7 @@ global using Microsoft.AspNetCore.Html;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Http.Features;
 global using Microsoft.AspNetCore.Http.Extensions;
+global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Mvc;
@@ -38,18 +39,21 @@ global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Mvc.Routing;
 global using Microsoft.AspNetCore.Mvc.ModelBinding;
 global using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+global using Microsoft.AspNetCore.Mvc.Controllers;
+global using Microsoft.AspNetCore.Mvc.ViewFeatures;
 global using Microsoft.AspNetCore.Authorization;
-global using Microsoft.AspNetCore.Razor.TagHelpers;
 global using Microsoft.AspNetCore.Authentication;
-global using Microsoft.AspNetCore.Authentication.JwtBearer;
- 
+global using Microsoft.AspNetCore.Authentication.JwtBearer; 
 
 global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.FileProviders;
 global using Microsoft.Extensions.Configuration;
 global using Microsoft.Extensions.Hosting;
+global using Microsoft.Extensions.Caching;
 global using Microsoft.Extensions.Caching.Memory;
+global using Microsoft.Extensions.Caching.Distributed;
 global using Microsoft.Extensions.Options;
+
 
 global using Microsoft.IdentityModel.Tokens;
 
