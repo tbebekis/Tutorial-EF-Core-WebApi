@@ -3,6 +3,7 @@
     /// <summary>
     /// A <see cref="ApiResult"/> response for a single item
     /// </summary>
+    [Description("A requested object.")]
     public class ItemResult<T> : ApiResult
     {
         /// <summary>

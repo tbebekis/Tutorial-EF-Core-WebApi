@@ -57,14 +57,17 @@ namespace EFCoreWebApi.Library
         /// </summary>
         static public JwtSecurityToken ReadTokenFromRequestHeader(HttpContext HttpContext)
         {
-            // get the token from Authorization HTTP header
-            string sToken = Lib.GetHttpHeader(HttpContext.Request, HeaderNames.Authorization);
+            string AuthorizationHeaderValue = Lib.GetHttpHeader(HttpContext.Request, HeaderNames.Authorization);
 
-            if (!string.IsNullOrWhiteSpace(sToken))
+            if (!string.IsNullOrWhiteSpace(AuthorizationHeaderValue))
             {
-                sToken = sToken.Replace("Bearer ", string.Empty);
-                JwtSecurityToken Token = new JwtSecurityTokenHandler().ReadJwtToken(sToken);
-                return Token;
+                AuthorizationHeaderValue = AuthorizationHeaderValue.Trim();
+                if (AuthorizationHeaderValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                {
+                    AuthorizationHeaderValue = AuthorizationHeaderValue.Replace("Bearer ", string.Empty);
+                    JwtSecurityToken Token = new JwtSecurityTokenHandler().ReadJwtToken(AuthorizationHeaderValue);
+                    return Token;
+                }
             }
 
             return null;

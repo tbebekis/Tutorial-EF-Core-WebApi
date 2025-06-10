@@ -4,6 +4,7 @@
     /// <summary>
     /// Base response
     /// </summary>
+    [Description("Generic response.")]
     public class ApiResult
     {
         List<string> fErrors;
@@ -22,11 +23,11 @@
         {
             if (!string.IsNullOrWhiteSpace(ErrorText))
             {
-                if (Errors == null)
-                    Errors = new List<string>();
+                if (fErrors == null)
+                    fErrors = new List<string>();
 
-                if (!Errors.Contains(ErrorText))
-                    Errors.Add(ErrorText);
+                if (!fErrors.Contains(ErrorText))
+                    fErrors.Add(ErrorText);
 
                 Message = "Check the Errors list";
             }
@@ -36,8 +37,15 @@
         /// </summary>
         public virtual void ClearErrors()
         {
-            if (Errors != null)
-                Errors.Clear();
+            if (fErrors != null)
+                fErrors.Clear();
+        }
+
+        public virtual void CopyErrors(ApiResult Source)
+        {
+            this.Status = Source.Status;
+            foreach (var error in Source.Errors) 
+                this.Errors.Add(error);
         }
 
         public virtual void SetResult(int Status = -1, string ErrorMessage = null, string Message = null)
@@ -57,6 +65,8 @@
                 ErrorMessage = $"Error: {ErrorMessage}";
             else if (Status >= 400 && Status <= 599)
                 ErrorMessage = Microsoft.AspNetCore.WebUtilities.ReasonPhrases.GetReasonPhrase(Status);
+            else if (Status >= 1000)
+                ErrorMessage = ApiStatusCodes.StatusCodeToMessage[Status];
             else
                 ErrorMessage = $"Error: {Status}";
 
@@ -64,8 +74,8 @@
         }
         public virtual void NotAuthenticated()
         {
-            string ErrorMessage = "Invalid Token. A valid JTW access token is required.";
-            ErrorResult(StatusCodes.Status400BadRequest, ErrorMessage);
+            string ErrorMessage = "Not Authenticated. Invalid Token or not Token at all. A valid Access Token is required.";
+            ErrorResult(StatusCodes.Status401Unauthorized, ErrorMessage);
         }
         public virtual void TokenExpired(string ErrorMessage)
         {
@@ -102,12 +112,12 @@
         public string ErrorText => Succeeded ? string.Empty : string.Join(Environment.NewLine, Errors.ToArray());
  
         [Description("A Status numeric code. Could be a standard HTTP Status Code or an Api Status Code.")]
-        [DefaultValue(StatusCodes.Status200OK)]
+        [DefaultValue(StatusCodes.Status200OK), JsonPropertyOrder(-1002)]
         public int Status { get; set; } = StatusCodes.Status200OK;
         [Description("A response message. Defaults to OK.")]
-        [DefaultValue("OK")]
+        [DefaultValue("OK"), JsonPropertyOrder(-1001)]
         public string Message { get; set; } = "OK";
-        [Description("The list of errors, if any.")]
+        [Description("The list of errors, if any."), JsonPropertyOrder(-1000)]
         public List<string> Errors
         {
             get

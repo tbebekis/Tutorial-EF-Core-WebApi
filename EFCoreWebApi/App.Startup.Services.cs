@@ -40,7 +40,7 @@
 
             // ● custom services 
             builder.Services.AddScoped<ApiClientContext>();
-            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<ApiClientService>();
             builder.Services.AddScoped(typeof(DataService<>));
 
             // ● global exception handler
@@ -115,7 +115,6 @@
                 options.ClientErrorMapping[StatusCodes.Status404NotFound].Link =
                     "https://httpstatuses.com/404"; 
             });
-
 
             MvcBuilder.AddJsonOptions(options => SetupJsonSerializerOptions(options.JsonSerializerOptions));
         }

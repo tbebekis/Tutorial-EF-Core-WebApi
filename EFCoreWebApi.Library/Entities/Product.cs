@@ -23,4 +23,14 @@
         [Required, Precision(18, 4)]
         public decimal Price { get; set; }
     }
+
+    public class ProductEntityTypeConfiguration : IEntityTypeConfiguration<Product>
+    {
+        public void Configure(EntityTypeBuilder<Product> builder)
+        {
+            //builder
+            //    .Property(e => e.ClientId)
+            //    .IsRequired();
+        }
+    }
 }

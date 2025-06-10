@@ -64,7 +64,7 @@
             List<T> EntityList = await GetAllAsync(DataContext);
             Paging.TotalItems = EntityList.Count;
 
-            return EntityList.Skip(Paging.PageIndex)
+            return EntityList.Skip(Paging.PageIndex * Paging.PageSize)
                              .Take(Paging.PageSize)
                              .ToList();
         }
@@ -118,8 +118,10 @@
         /// </summary>
         protected virtual async Task<T> GetByProcAsync(AppDbContext DataContext, Func<T, bool> Proc)
         {
-            DbSet<T> DbSet = DataContext.Set<T>();           
-            return await DbSet.AsNoTracking().FirstOrDefaultAsync(x => Proc(x));    //return DbSet.Where(Proc).FirstOrDefault();
+            DbSet<T> DbSet = DataContext.Set<T>();
+            //return await DbSet.AsNoTracking().Where(x => Proc(x)).FirstOrDefaultAsync();    //return DbSet.Where(Proc).FirstOrDefault();
+            List<T> List = await DbSet.AsNoTracking().ToListAsync();
+            return List.FirstOrDefault(Proc);
         }
 
         // ● CRUD

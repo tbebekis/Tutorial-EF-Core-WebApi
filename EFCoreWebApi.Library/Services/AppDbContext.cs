@@ -1,4 +1,6 @@
-﻿namespace EFCoreWebApi.Library
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace EFCoreWebApi.Library
 {
     public class AppDbContext: DbContext
     {
@@ -15,7 +17,8 @@
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        { 
+        {
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Lib).Assembly);
         }
 
         // ● overrides
@@ -25,6 +28,8 @@
                 optionsBuilder.UseInMemoryDatabase(AppDbContext.SMemoryDatabase);
             else
                 optionsBuilder.UseSqlite("Data Source=EFCoreWebApi.db3", SqliteOptionsBuilder => { });
+
+            
         }
 
         // ● construction
@@ -52,6 +57,6 @@
         }
 
         // ● Db Sets
-        public DbSet<Product> Products { get; set; }
+        //public DbSet<Product> Products { get; set; }
     }
 }

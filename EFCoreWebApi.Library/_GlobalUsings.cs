@@ -62,6 +62,7 @@ global using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 global using Microsoft.EntityFrameworkCore.Metadata;
 global using Microsoft.EntityFrameworkCore.Metadata.Internal;
+global using Microsoft.EntityFrameworkCore.Metadata.Builders;
 global using Microsoft.EntityFrameworkCore.Infrastructure;
 global using Microsoft.EntityFrameworkCore.Storage;
 global using Microsoft.EntityFrameworkCore.ChangeTracking;

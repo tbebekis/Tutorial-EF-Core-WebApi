@@ -53,4 +53,14 @@
         /// </summary>
         public bool IsBlocked { get; set; }
     }
+
+    public class ApiClientEntityTypeConfiguration : IEntityTypeConfiguration<ApiClient>
+    {
+        public void Configure(EntityTypeBuilder<ApiClient> builder)
+        {
+            //builder
+            //    .Property(e => e.ClientId)
+            //    .IsRequired();
+        }
+    }
 }

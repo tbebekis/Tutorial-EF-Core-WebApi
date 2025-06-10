@@ -2,6 +2,17 @@
 {
     static public partial class DemoData
     {
+        static public List<ApiClient> GetApiClientList()
+        {
+            List<ApiClient> List = new()
+            {
+                new ApiClient("client0", "secret", "Client-0"),
+                new ApiClient("client1", "secret", "Client-1"),
+                new ApiClient("client2", "secret", "Client-2")
+            };
+
+            return List;
+        }
         static public List<Product> GetProductList()
         {
             Random R = new Random();
@@ -40,10 +51,14 @@
 
         static public void AddInMemoryData()
         {
+            List<ApiClient> Clients = GetApiClientList();
             List<Product> Products = GetProductList();
 
             using (var DataContext = new AppDbContext())
             {
+                DbSet<ApiClient> ClientSet = DataContext.Set<ApiClient>();
+                ClientSet.AddRange(Clients);
+
                 DbSet<Product> ProductSet = DataContext.Set<Product>();
                 ProductSet.AddRange(Products);
 

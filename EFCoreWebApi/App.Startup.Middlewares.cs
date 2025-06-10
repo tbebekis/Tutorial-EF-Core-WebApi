@@ -53,7 +53,6 @@
             app.UseAuthentication();
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             Lib.AddObjectMappings();

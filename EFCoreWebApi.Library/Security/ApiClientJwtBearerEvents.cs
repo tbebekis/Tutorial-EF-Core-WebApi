@@ -47,13 +47,16 @@
         /// </summary>
         public override Task TokenValidated(TokenValidatedContext context)
         {
-            ClaimsPrincipal Principal = context.Principal;
-            string JtiValue = Principal.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+            ClaimsPrincipal Principal = context.Principal;             
 
+            List<Claim> ClaimList = Tokens.GetClaimList(context.SecurityToken);
+
+            string JtiValue = Tokens.GetClaimValue(ClaimList, JwtRegisteredClaimNames.Jti);  
+ 
             if (string.IsNullOrWhiteSpace(JtiValue))
             {
                 context.Response.StatusCode = StatusCodes.Status401Unauthorized; 
-                context.Fail("Invalid Token. A valid JTW access token is required.");
+                context.Fail("Invalid Token. A valid Access Token is required.");
             }
             else
             {
@@ -79,11 +82,11 @@
 
             // error string is a must
             if (string.IsNullOrWhiteSpace(context.Error))
-                context.Error = "invalid_token";
+                context.Error = "Not Authenticated.";
 
             // error description string is a must
             if (string.IsNullOrWhiteSpace(context.ErrorDescription))
-                context.ErrorDescription = "Invalid Token. A valid JTW access token is required.";
+                context.ErrorDescription = "Not Authenticated. Invalid Token or not Token at all. A valid Access Token is required.";
 
             ApiResult.NotAuthenticated();
 
