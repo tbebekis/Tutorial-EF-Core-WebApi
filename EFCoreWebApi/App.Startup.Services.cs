@@ -1,7 +1,6 @@
 ﻿namespace EFCoreWebApi
 {
 
-
     static public partial class App
     {
         static void SetupJsonSerializerOptions(JsonSerializerOptions JsonOptions)
@@ -31,17 +30,13 @@
             // AddDbContext() scoped servicea
             // SEE: https://learn.microsoft.com/en-us/ef/core/performance/advanced-performance-topics
             //builder.Services.AddDbContextPool<AppDbContext>(context => context.UseSqlite(), poolSize: 1024);
-
-            if (Lib.UseInMemoryDatabase)
-            {
-                builder.Services.AddDbContext<AppDbContext>();
-                //builder.Services.AddDbContext<AppDbContext>(context => { context.UseInMemoryDatabase(AppDbContext.SMemoryDatabase); });
-            }            
+            builder.Services.AddDbContext<AppDbContext>();
 
             // ● custom services 
             builder.Services.AddScoped<ApiClientContext>();
             builder.Services.AddScoped<ApiClientService>();
             builder.Services.AddScoped(typeof(DataService<>));
+            builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 
             // ● global exception handler
             builder.Services.AddExceptionHandler<ExceptionHandler>();
@@ -80,15 +75,26 @@
 
                     ValidIssuer = Jwt.Issuer,                  
                     ValidAudiences = new List<string> { Jwt.Audience },                    
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Jwt.EncryptionKey)), 
                 };
-
             
                 o.RequireHttpsMetadata = false;
                 o.SaveToken = true;
                 o.TokenValidationParameters = ValidationParams;
 
                 o.Events = new ApiClientJwtBearerEvents();
+
+                /// <para>The JWT token handler of Asp.Net Core, by default, maps inbound claims using a certain logic.</para>
+                /// <para>This default mapping happens when MapInboundClaims = true; which is the default.</para>
+                /// <para>By default the JWT token handler, maps, for example, the JwtRegisteredClaimNames.Sub 
+                /// to http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier claim.</para>
+                /// <para>Setting <see cref="JwtBearerOptions.MapInboundClaims"/> to false disables that default claim mapping.</para>
+                /// <para>Another way to check the inbound claims, as they are, i.e. without any mapping applied,
+                /// is to read the Token string from HTTP Authorization header
+                /// as the Tokens.ReadTokenFromRequestHeader() does.</para>
+                /// <para>SEE: https://stackoverflow.com/a/68253821/1779320</para>
+                /// <para>SEE: https://stackoverflow.com/a/62477483/1779320</para>
+                // o.MapInboundClaims = false;
             });
 
             // ● Authorization  

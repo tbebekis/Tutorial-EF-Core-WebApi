@@ -8,7 +8,6 @@
 
             if (HttpStatus >= 400 && HttpStatus <= 599)
             {
-                // string ErrorMessage = Microsoft.AspNetCore.WebUtilities.ReasonPhrases.GetReasonPhrase(HttpStatus);
                 ApiResult ApiResult = new();
                 ApiResult.ErrorResult(HttpStatus);
                 string JsonText = JsonSerializer.Serialize(ApiResult);
@@ -16,8 +15,6 @@
             }
 
             return Task.CompletedTask;
-
-           // await Task.CompletedTask;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace EFCoreWebApi.Entities
 {
-    [Table("Product")]
+    [Table(nameof(Product))]
     [Index(nameof(Name), IsUnique = true)]
     [CRUDMode]
     public class Product: BaseEntity

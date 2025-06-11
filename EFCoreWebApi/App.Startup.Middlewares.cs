@@ -62,6 +62,13 @@
             {
                 DemoData.AddInMemoryData();
             }
+            else
+            {
+                using (var context = new AppDbContext())
+                {
+                    context.Database.EnsureCreated();
+                }
+            }
         }
     }
 }

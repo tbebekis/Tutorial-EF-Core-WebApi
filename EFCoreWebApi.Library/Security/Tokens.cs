@@ -50,10 +50,19 @@ namespace EFCoreWebApi.Library
         }
 
         /// <summary>
-        /// For debug purposes. 
         /// Reads a token by reading the <see cref="HeaderNames.Authorization"/> header 
         /// from <see cref="HttpRequest.Headers"/>, 
         /// and converting the token string to a <see cref="JwtSecurityToken"/>
+        /// <para>The JWT token handler of Asp.Net Core, by default, maps inbound claims using a certain logic.</para>
+        /// <para>This default mapping happens when MapInboundClaims = true; which is the default.</para>
+        /// <para>By default the JWT token handler, maps, for example, the JwtRegisteredClaimNames.Sub 
+        /// to http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier claim.</para>
+        /// <para>Setting <see cref="JwtBearerOptions.MapInboundClaims"/> to false disables that default claim mapping.</para>
+        /// <para>Another way to check the inbound claims, as they are, i.e. without any mapping applied,
+        /// is to read the Token string from HTTP Authorization header
+        /// as the Tokens.ReadTokenFromRequestHeader() does.</para>
+        /// <para>SEE: https://stackoverflow.com/a/68253821/1779320</para>
+        /// <para>SEE: https://stackoverflow.com/a/62477483/1779320</para>
         /// </summary>
         static public JwtSecurityToken ReadTokenFromRequestHeader(HttpContext HttpContext)
         {

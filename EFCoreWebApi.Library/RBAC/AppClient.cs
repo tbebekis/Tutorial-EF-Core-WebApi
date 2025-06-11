@@ -4,14 +4,18 @@
     /// <summary>
     /// A service or application which is client to this Api 
     /// </summary>
-    [Table("ApiClient")]
-    public class ApiClient: BaseEntity, IApiClient
+    [Index(nameof(ClientId), IsUnique = true)]
+    [Table(nameof(AppClient))]
+    public class AppClient: BaseEntity, IAppClient
     {
-        public ApiClient()
+        List<AppRole> fRoles;
+        List<AppPermission> fPermissions;
+
+        public AppClient()
             : base() 
         {
         }
-        public ApiClient(string ClientId, string PlainTextSecret, string Name = "")
+        public AppClient(string ClientId, string PlainTextSecret, string Name = "")
             : this()
         {
             this.SetId();
@@ -42,7 +46,7 @@
         /// <summary>
         /// The client secret salt
         /// </summary>
-        [Column("Salt"), MaxLength(96)]
+        [Column("Salt"), MaxLength(96), JsonIgnore]
         public string SecretSalt { get; set; }
         /// <summary>
         /// Optional. The requestor name
@@ -52,11 +56,32 @@
         /// True when requestor is blocked by admins
         /// </summary>
         public bool IsBlocked { get; set; }
+
+        [NotMapped]
+        public List<AppRole> Roles
+        {
+            get
+            {
+                if (fRoles == null)
+                    fRoles = RBAC.GetClientRoles(Id);
+                return fRoles;
+            }
+        }
+        [NotMapped]
+        public List<AppPermission> Permissions
+        {
+            get
+            {
+                if (fPermissions == null)
+                    fPermissions = RBAC.GetClientPermissions(Id);
+                return fPermissions;
+            }
+        }
     }
 
-    public class ApiClientEntityTypeConfiguration : IEntityTypeConfiguration<ApiClient>
+    public class ApiClientEntityTypeConfiguration : IEntityTypeConfiguration<AppClient>
     {
-        public void Configure(EntityTypeBuilder<ApiClient> builder)
+        public void Configure(EntityTypeBuilder<AppClient> builder)
         {
             //builder
             //    .Property(e => e.ClientId)

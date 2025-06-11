@@ -1,5 +1,6 @@
 ﻿namespace EFCoreWebApi.Entities
 {
+    [Table(nameof(ProductCategory))]
     public class Category: BaseEntity
     {
         public Category()

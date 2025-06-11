@@ -1,14 +1,14 @@
 ﻿namespace EFCoreWebApi.Services
 {
-    public class ApiClientService: DataService<ApiClient>
+    public class ApiClientService: DataService<AppClient>
     {
         /// <summary>
         /// Validates the specified user credentials and returns a <see cref="IRequestor"/> on success, else null.
         /// </summary>
-        public async Task<ItemResult<IApiClient>> ValidateApiClientCredentials(string ClientId, string PlainTextSecret)
+        public async Task<ItemResult<IAppClient>> ValidateApiClientCredentials(string ClientId, string PlainTextSecret)
         {
-            ItemResult<IApiClient> Result = new();
-            ItemResult<ApiClient> ClientResult = await GetByProcAsync(c => c.ClientId == ClientId);
+            ItemResult<IAppClient> Result = new();
+            ItemResult<AppClient> ClientResult = await GetByProcAsync(c => c.ClientId == ClientId);
 
             if (ClientResult.Item == null || !ClientResult.Succeeded)
             {

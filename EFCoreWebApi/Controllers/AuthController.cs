@@ -36,8 +36,8 @@
                 }
                 else
                 {
-                    ItemResult<IApiClient> DataResult = await Service.ValidateApiClientCredentials(ClientId, Secret);
-                    IApiClient Client = DataResult.Item;
+                    ItemResult<IAppClient> DataResult = await Service.ValidateApiClientCredentials(ClientId, Secret);
+                    IAppClient Client = DataResult.Item;
 
                     if (DataResult.Succeeded && Client != null)
                     {
@@ -82,7 +82,7 @@
                 {
                     // refresh token request is a good chance to check if the Identity is valid or not.
                     // An Admin maybe has set the Identity to blocked or something similar
-                    ItemResult<ApiClient> ClientResult = await Service.GetByIdAsync(Id);
+                    ItemResult<AppClient> ClientResult = await Service.GetByIdAsync(Id);
                     if (ClientResult.Item == null || ClientResult.Item.IsBlocked)
                     {
                         Result.ErrorResult(ApiStatusCodes.InvalidIdentity);

@@ -170,6 +170,6 @@
         /// </summary>
         static public IObjectMapper ObjectMapper { get; } = new ObjectMapper();
 
-        static public bool UseInMemoryDatabase { get; } = true;
+        static public bool UseInMemoryDatabase { get; } = false;
     }
 }

@@ -19,6 +19,11 @@ namespace EFCoreWebApi.Library
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(Lib).Assembly);
+
+            if (!Lib.UseInMemoryDatabase)
+            {
+                DemoData.AddData(modelBuilder);
+            }
         }
 
         // ● overrides
@@ -27,9 +32,12 @@ namespace EFCoreWebApi.Library
             if (Lib.UseInMemoryDatabase)
                 optionsBuilder.UseInMemoryDatabase(AppDbContext.SMemoryDatabase);
             else
-                optionsBuilder.UseSqlite("Data Source=EFCoreWebApi.db3", SqliteOptionsBuilder => { });
+            {
+                string DatabasePath = Path.Combine(System.AppContext.BaseDirectory, "EFCoreWebApi.db3");
+                optionsBuilder.UseSqlite($"Data Source={DatabasePath}", SqliteOptionsBuilder => { });
+            }
 
-            
+
         }
 
         // ● construction
@@ -56,7 +64,6 @@ namespace EFCoreWebApi.Library
         {
         }
 
-        // ● Db Sets
-        //public DbSet<Product> Products { get; set; }
+
     }
 }

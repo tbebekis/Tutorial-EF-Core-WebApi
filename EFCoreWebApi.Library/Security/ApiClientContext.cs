@@ -35,7 +35,7 @@
         /// <summary>
         /// The api client of the current request
         /// </summary>
-        public IApiClient Client { get; set; }
+        public IAppClient Client { get; set; }
  
         /// <summary>
         /// The culture (language) of the current request specified as a culture code (en-US, el-GR)

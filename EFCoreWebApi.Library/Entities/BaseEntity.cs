@@ -1,6 +1,6 @@
 ﻿namespace EFCoreWebApi.Entities
 {
-     
+    [PrimaryKey(nameof(Id))]
     public class BaseEntity
     {
         public BaseEntity() 
